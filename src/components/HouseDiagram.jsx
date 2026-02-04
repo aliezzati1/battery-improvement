@@ -1,5 +1,5 @@
 import React from 'react'
-import { useRive } from '@rive-app/react'
+import { useRive } from 'rive-react'
 import './HouseDiagram.css'
 
 function HouseDiagram() {
