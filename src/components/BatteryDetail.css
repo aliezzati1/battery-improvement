@@ -1,0 +1,39 @@
+.battery-detail {
+  background-color: white;
+  width: 100%;
+  max-width: 393px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.battery-detail-header {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.status-nav-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.house-container {
+  background-color: white;
+  height: 344px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.battery-detail-content {
+  background-color: #f2efec;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
+  padding-bottom: 100px; /* Space for sticky bottom nav */
+}

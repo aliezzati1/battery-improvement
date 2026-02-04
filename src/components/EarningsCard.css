@@ -1,0 +1,143 @@
+.earnings-card {
+  background-color: white;
+  border-radius: 4px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 361px;
+  margin: 0 auto;
+}
+
+.earnings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.earnings-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 26px;
+  color: black;
+  letter-spacing: -0.27px;
+}
+
+.title-main {
+  font-size: 18px;
+  line-height: 26px;
+}
+
+.title-month {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.chevron-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.earnings-content {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.earnings-chart {
+  width: 81px;
+  height: 81px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-value {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 26px;
+  fill: black;
+  letter-spacing: -0.27px;
+}
+
+.chart-currency {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  fill: black;
+  letter-spacing: -0.14px;
+}
+
+.earnings-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.earnings-dot {
+  background-color: #009a33;
+}
+
+.savings-dot {
+  background-color: #ffd700;
+}
+
+.legend-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: black;
+  letter-spacing: -0.24px;
+  flex: 1;
+}
+
+.legend-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+.value-number {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 32px;
+  color: black;
+  letter-spacing: -0.7px;
+}
+
+.value-currency {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: black;
+  letter-spacing: -0.24px;
+}

@@ -1,0 +1,39 @@
+.navigation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+  width: 100%;
+  max-width: 361px;
+  margin: 0 auto;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+.nav-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+  color: black;
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+
+.arrow-left-icon,
+.notification-icon {
+  stroke: black;
+}

@@ -1,0 +1,83 @@
+.charging-status-card {
+  background-color: white;
+  border-radius: 4px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 361px;
+  margin: 0 auto;
+}
+
+.charging-status-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.charging-status-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.charging-status-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 26px;
+  color: black;
+  letter-spacing: -0.27px;
+  margin: 0;
+}
+
+.charging-status-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clock-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.time-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #353230;
+  letter-spacing: -0.24px;
+}
+
+.time-value {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #353230;
+  letter-spacing: -0.24px;
+}
+
+.charging-status-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.charge-icon-circle {
+  width: 48px;
+  height: 48px;
+  background-color: #e8f5e9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
