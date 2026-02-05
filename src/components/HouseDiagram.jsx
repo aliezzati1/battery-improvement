@@ -18,7 +18,7 @@ function HouseDiagram() {
       attempts++
       
       // Check if Rive is available (try multiple possible global names)
-      const rive = window.rive || window.Rive || window.riveApp
+      const rive = window.rive || window.Rive || window.riveApp || window.riveRuntime
       
       if (!rive && attempts < maxAttempts) {
         timeoutRef.current = setTimeout(initRive, 100)
@@ -26,10 +26,12 @@ function HouseDiagram() {
       }
 
       if (!rive) {
-        console.error('Rive library not loaded after timeout')
-        setError('Rive animation failed to load')
+        console.error('Rive library not loaded after timeout. Available globals:', Object.keys(window).filter(k => k.toLowerCase().includes('rive')))
+        setError('Rive library not loaded')
         return
       }
+      
+      console.log('Rive library found:', rive)
 
       try {
         const canvas = canvasRef.current
@@ -62,41 +64,77 @@ function HouseDiagram() {
 
         // Try different Rive API patterns
         let riveInstance = null
+        let loadError = null
         
-        // Pattern 1: rive.Rive
+        // Pattern 1: rive.Rive (most common)
         if (rive.Rive) {
-          riveInstance = new rive.Rive({
-            src: '/house-animation.riv',
-            canvas: canvas,
-            autoplay: true,
-            onLoad: () => {
-              console.log('Rive animation loaded successfully')
-              setError(null)
-            },
-            onLoadError: (err) => {
-              console.error('Rive animation error:', err)
-              setError('Failed to load animation file')
-            }
-          })
+          try {
+            riveInstance = new rive.Rive({
+              src: '/house-animation.riv',
+              canvas: canvas,
+              autoplay: true,
+              onLoad: () => {
+                console.log('Rive animation loaded successfully')
+                setError(null)
+              },
+              onLoadError: (err) => {
+                console.error('Rive animation load error:', err)
+                loadError = err
+                setError('Failed to load animation file. Check console for details.')
+              }
+            })
+          } catch (err) {
+            console.error('Error creating Rive instance:', err)
+            loadError = err
+          }
         }
-        // Pattern 2: rive directly
+        // Pattern 2: rive directly as constructor
         else if (typeof rive === 'function') {
-          riveInstance = new rive({
-            src: '/house-animation.riv',
-            canvas: canvas,
-            autoplay: true,
-            onLoad: () => {
-              console.log('Rive animation loaded successfully')
-              setError(null)
-            },
-            onLoadError: (err) => {
-              console.error('Rive animation error:', err)
-              setError('Failed to load animation file')
-            }
-          })
+          try {
+            riveInstance = new rive({
+              src: '/house-animation.riv',
+              canvas: canvas,
+              autoplay: true,
+              onLoad: () => {
+                console.log('Rive animation loaded successfully')
+                setError(null)
+              },
+              onLoadError: (err) => {
+                console.error('Rive animation load error:', err)
+                loadError = err
+                setError('Failed to load animation file. Check console for details.')
+              }
+            })
+          } catch (err) {
+            console.error('Error creating Rive instance:', err)
+            loadError = err
+          }
+        }
+        // Pattern 3: Check for RivePlayer or other patterns
+        else if (rive.RivePlayer) {
+          try {
+            riveInstance = new rive.RivePlayer({
+              src: '/house-animation.riv',
+              canvas: canvas,
+              autoplay: true,
+            })
+          } catch (err) {
+            console.error('Error creating RivePlayer:', err)
+            loadError = err
+          }
         } else {
-          console.error('Unknown Rive API structure:', rive)
-          setError('Rive API not recognized')
+          console.error('Unknown Rive API structure. Available:', Object.keys(rive))
+          setError('Rive API not recognized. Check console.')
+          return
+        }
+        
+        if (!riveInstance && loadError) {
+          setError('Failed to initialize Rive: ' + (loadError.message || 'Unknown error'))
+          return
+        }
+        
+        if (!riveInstance) {
+          setError('Rive instance not created')
           return
         }
 
