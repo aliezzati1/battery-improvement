@@ -4,15 +4,16 @@ import './PerformanceCard.css'
 
 function PerformanceCard({ onClick }) {
   // Sample data for 24 hours (hourly data points)
-  // Based on the design: charging at low prices (early morning), discharging at high prices (midday)
+  // Based on the design: price starts at 0, stays at 0 until 06:00, then increases
+  // Charging happens at low prices (early morning), discharging at high prices (midday)
   const data = [
-    { time: '00', price: 50, battery: 0 },
-    { time: '01', price: 45, battery: 0 },
-    { time: '02', price: 40, battery: 0 },
-    { time: '03', price: 35, battery: 0.5 },
-    { time: '04', price: 30, battery: 1.5 },
-    { time: '05', price: 25, battery: 2.5 },
-    { time: '06', price: 30, battery: 1.5 },
+    { time: '00', price: 0, battery: 0 },
+    { time: '01', price: 0, battery: 0 },
+    { time: '02', price: 0, battery: 0 },
+    { time: '03', price: 0, battery: 1 },
+    { time: '04', price: 0, battery: 1.5 },
+    { time: '05', price: 0, battery: 1 },
+    { time: '06', price: 20, battery: 0 },
     { time: '07', price: 50, battery: 0 },
     { time: '08', price: 80, battery: 0 },
     { time: '09', price: 110, battery: 0 },
@@ -27,9 +28,9 @@ function PerformanceCard({ onClick }) {
     { time: '18', price: 100, battery: 0 },
     { time: '19', price: 70, battery: 0 },
     { time: '20', price: 50, battery: 0 },
-    { time: '21', price: 45, battery: 0 },
-    { time: '22', price: 40, battery: 0 },
-    { time: '23', price: 35, battery: 0 },
+    { time: '21', price: 40, battery: 0 },
+    { time: '22', price: 30, battery: 0 },
+    { time: '23', price: 20, battery: 0 },
   ]
 
   // Custom bar colors
