@@ -86,7 +86,7 @@ function PerformanceCard({ onClick }) {
             <YAxis
               yAxisId="price"
               orientation="left"
-              domain={[0, 200]}
+              domain={[-200, 200]}
               tick={{ fill: '#353230', fontSize: 12, fontFamily: 'Inter', letterSpacing: '-0.06px' }}
               tickFormatter={(value) => {
                 if (value === 0 || value === 200) return String(value)
@@ -108,6 +108,12 @@ function PerformanceCard({ onClick }) {
                   letterSpacing: '-0.06px'
                 } 
               }}
+            />
+            <ReferenceLine 
+              yAxisId="price" 
+              y={0} 
+              stroke="#353230" 
+              strokeWidth={1} 
             />
             <YAxis
               yAxisId="battery"
@@ -148,6 +154,7 @@ function PerformanceCard({ onClick }) {
               fill="url(#priceGradient)"
               stroke="none"
               isAnimationActive={false}
+              baseLine={0}
             />
             <Line
               yAxisId="price"
