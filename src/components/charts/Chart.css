@@ -13,6 +13,14 @@
   padding-left: 0;
 }
 
+.chart-legend-top {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
 .legend-item {
   display: flex;
   gap: 8px;

@@ -1,8 +1,33 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts'
 import './Chart.css'
 
 function RevenueChart({ data }) {
+  // Calculate dynamic max value from data
+  const maxRevenue = useMemo(() => {
+    const max = Math.max(...data.map(d => d.revenue))
+    if (max === 0) return 10 // Default if no revenue
+    // Round up to nearest nice number (5, 10, 20, 30, 50, etc.)
+    const magnitude = Math.pow(10, Math.floor(Math.log10(max)))
+    const normalized = max / magnitude
+    let niceMax
+    if (normalized <= 1) niceMax = magnitude
+    else if (normalized <= 2) niceMax = 2 * magnitude
+    else if (normalized <= 5) niceMax = 5 * magnitude
+    else niceMax = 10 * magnitude
+    return Math.max(10, niceMax) // Minimum of 10
+  }, [data])
+
+  // Calculate tick values for evenly distributed gridlines
+  const tickValues = useMemo(() => {
+    const ticks = [0]
+    if (maxRevenue > 0) {
+      const step = maxRevenue / 2
+      ticks.push(step, maxRevenue)
+    }
+    return ticks
+  }, [maxRevenue])
+
   return (
     <div className="chart-container">
       <ResponsiveContainer width="100%" height={200}>
@@ -32,10 +57,10 @@ function RevenueChart({ data }) {
           <YAxis
             yAxisId="revenue"
             orientation="right"
-            domain={[0, 30]}
+            domain={[0, maxRevenue]}
             tick={{ fill: '#353230', fontSize: 12, fontFamily: 'Inter', letterSpacing: '-0.06px' }}
             tickFormatter={(value) => {
-              if (value === 0 || value === 15 || value === 30) return String(value)
+              if (tickValues.includes(value)) return String(Math.round(value))
               return ''
             }}
             axisLine={false}

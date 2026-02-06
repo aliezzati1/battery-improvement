@@ -1,8 +1,23 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 import './Chart.css'
 
 function SpotPriceChart({ data }) {
+  // Calculate dynamic max value from data
+  const maxPrice = useMemo(() => {
+    const max = Math.max(...data.map(d => d.spotPrice))
+    if (max === 0) return 200 // Default
+    // Round up to nearest nice number
+    const magnitude = Math.pow(10, Math.floor(Math.log10(max)))
+    const normalized = max / magnitude
+    let niceMax
+    if (normalized <= 1) niceMax = magnitude
+    else if (normalized <= 2) niceMax = 2 * magnitude
+    else if (normalized <= 5) niceMax = 5 * magnitude
+    else niceMax = 10 * magnitude
+    return Math.max(50, niceMax) // Minimum of 50
+  }, [data])
+
   return (
     <div className="chart-container">
       <ResponsiveContainer width="100%" height={200}>
@@ -39,10 +54,11 @@ function SpotPriceChart({ data }) {
           <YAxis
             yAxisId="price"
             orientation="right"
-            domain={[0, 200]}
+            domain={[0, maxPrice]}
             tick={{ fill: '#353230', fontSize: 12, fontFamily: 'Inter', letterSpacing: '-0.06px' }}
             tickFormatter={(value) => {
-              if (value === 0 || value === 100 || value === 200) return String(value)
+              const step = maxPrice / 2
+              if (value === 0 || value === step || value === maxPrice) return String(Math.round(value))
               return ''
             }}
             axisLine={false}
