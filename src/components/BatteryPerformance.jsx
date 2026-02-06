@@ -63,13 +63,27 @@ function BatteryPerformance({ onBack }) {
 
   // Handle cursor line dragging
   const handleCursorStart = (e) => {
-    setIsDraggingCursor(true)
-    updateCursorPosition(e)
+    try {
+      // Only prevent default if we're actually on a chart
+      const target = e.target
+      if (target.closest('.chart-wrapper')) {
+        e.preventDefault()
+        setIsDraggingCursor(true)
+        updateCursorPosition(e)
+      }
+    } catch (error) {
+      console.error('Error in handleCursorStart:', error)
+    }
   }
 
   const handleCursorMove = (e) => {
-    if (isDraggingCursor) {
-      updateCursorPosition(e)
+    try {
+      if (isDraggingCursor) {
+        e.preventDefault()
+        updateCursorPosition(e)
+      }
+    } catch (error) {
+      console.error('Error in handleCursorMove:', error)
     }
   }
 
@@ -78,34 +92,40 @@ function BatteryPerformance({ onBack }) {
   }
 
   const updateCursorPosition = (e) => {
-    if (!chartsContainerRef.current) return
-    
-    const container = chartsContainerRef.current
-    const rect = container.getBoundingClientRect()
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX
-    const x = clientX - rect.left
-    
-    // Find the first chart wrapper to get its width
-    const firstChart = container.querySelector('.chart-wrapper')
-    if (!firstChart) return
-    
-    const chartRect = firstChart.getBoundingClientRect()
-    // Account for padding: 12px on each side = 24px total
-    const chartWidth = chartRect.width - 24
-    const chartLeft = chartRect.left - rect.left + 12 // Left padding offset
-    
-    if (x < chartLeft || x > chartLeft + chartWidth) {
-      setCursorTime(null)
-      return
+    try {
+      if (!chartsContainerRef.current) return
+      
+      const container = chartsContainerRef.current
+      const rect = container.getBoundingClientRect()
+      const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : (e.clientX || 0)
+      if (!clientX) return
+      
+      const x = clientX - rect.left
+      
+      // Find the first chart wrapper to get its width
+      const firstChart = container.querySelector('.chart-wrapper')
+      if (!firstChart) return
+      
+      const chartRect = firstChart.getBoundingClientRect()
+      // Account for padding: 12px on each side = 24px total
+      const chartWidth = chartRect.width - 24
+      const chartLeft = chartRect.left - rect.left + 12 // Left padding offset
+      
+      if (x < chartLeft || x > chartLeft + chartWidth) {
+        setCursorTime(null)
+        return
+      }
+      
+      // Convert X position to hour (0-23)
+      // Chart X-axis goes from 0 to 24 hours
+      const relativeX = x - chartLeft
+      const hour = (relativeX / chartWidth) * 24
+      const clampedHour = Math.max(0, Math.min(23, Math.floor(hour)))
+      
+      setCursorTime(clampedHour)
+    } catch (error) {
+      console.error('Error in updateCursorPosition:', error)
     }
-    
-    // Convert X position to hour (0-23)
-    // Chart X-axis goes from 0 to 24 hours
-    const relativeX = x - chartLeft
-    const hour = (relativeX / chartWidth) * 24
-    const clampedHour = Math.max(0, Math.min(23, Math.floor(hour)))
-    
-    setCursorTime(clampedHour)
   }
 
   return (
@@ -153,14 +173,6 @@ function BatteryPerformance({ onBack }) {
         <div 
           className="charts-container"
           ref={chartsContainerRef}
-          onMouseDown={handleCursorStart}
-          onMouseMove={handleCursorMove}
-          onMouseUp={handleCursorEnd}
-          onMouseLeave={handleCursorEnd}
-          onTouchStart={handleCursorStart}
-          onTouchMove={handleCursorMove}
-          onTouchEnd={handleCursorEnd}
-          style={{ touchAction: 'none' }}
         >
           {chartOrder.map((chart, index) => {
             const ChartComponent = chart.component
@@ -172,6 +184,14 @@ function BatteryPerformance({ onBack }) {
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDragEnd={handleDragEnd}
+                onMouseDown={handleCursorStart}
+                onMouseMove={handleCursorMove}
+                onMouseUp={handleCursorEnd}
+                onMouseLeave={handleCursorEnd}
+                onTouchStart={handleCursorStart}
+                onTouchMove={handleCursorMove}
+                onTouchEnd={handleCursorEnd}
+                style={{ touchAction: 'pan-y' }}
               >
                 <div className="chart-header">
                   <div className="chart-title-section">

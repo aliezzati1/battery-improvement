@@ -121,9 +121,6 @@
   gap: 8px;
   padding-bottom: 80px;
   position: relative;
-  cursor: crosshair;
-  user-select: none;
-  -webkit-user-select: none;
 }
 
 .chart-wrapper {
@@ -133,6 +130,7 @@
   cursor: move;
   transition: opacity 0.2s;
   position: relative;
+  cursor: crosshair;
 }
 
 .chart-wrapper.dragging {
