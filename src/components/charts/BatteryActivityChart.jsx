@@ -3,19 +3,23 @@ import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, C
 import './Chart.css'
 
 function BatteryActivityChart({ data }) {
-  // Transform data: positive values for charging, negative for discharging
-  // But we need to display them on a 0-240 scale where 0 is in the middle (120)
-  const transformedData = data.map(d => ({
-    ...d,
-    // Map to 0-240 scale where 120 is zero
-    // Positive values: 120 to 240, Negative values: 0 to 120
-    displayValue: d.batteryActivity >= 0 
-      ? 120 + (d.batteryActivity * 30) // Scale positive values
-      : 120 + (d.batteryActivity * 30), // Scale negative values (will be < 120)
-    baseValue: 120, // Zero line at middle
-    isPositive: d.batteryActivity >= 0,
-    absValue: Math.abs(d.batteryActivity),
-  }))
+  // Transform data for display: use absolute scale 0-240 where 120 is zero
+  // Positive values (charging) go from 120 to 240
+  // Negative values (discharging) go from 120 to 0
+  const transformedData = data.map(d => {
+    const absValue = Math.abs(d.batteryActivity)
+    const scaledValue = absValue * 30 // Scale to fit 0-120 range (4 kWh max = 120)
+    
+    return {
+      ...d,
+      // For positive: bar goes from 120 upward
+      // For negative: bar goes from 120 downward
+      chargingValue: d.batteryActivity >= 0 ? scaledValue : 0,
+      dischargingValue: d.batteryActivity < 0 ? scaledValue : 0,
+      baseValue: 120,
+      isPositive: d.batteryActivity >= 0,
+    }
+  })
 
   return (
     <div className="chart-container">
@@ -50,7 +54,7 @@ function BatteryActivityChart({ data }) {
             tick={{ fill: '#353230', fontSize: 12, fontFamily: 'Inter', letterSpacing: '-0.06px' }}
             tickFormatter={(value) => {
               if (value === 0 || value === 120 || value === 240) {
-                // Map back: 0 -> -4, 120 -> 0, 240 -> +4
+                // Map: 0 -> -4, 120 -> 0, 240 -> +4
                 if (value === 120) return '0'
                 if (value === 0) return '-4'
                 if (value === 240) return '4'
@@ -67,20 +71,31 @@ function BatteryActivityChart({ data }) {
             stroke="#353230" 
             strokeWidth={1} 
           />
+          {/* Charging bars (green, upward from 120) */}
           <Bar
             yAxisId="activity"
-            dataKey="displayValue"
+            dataKey="chargingValue"
             baseValue={120}
             radius={[1, 1, 0, 0]}
             isAnimationActive={false}
             barSize={7}
           >
-            {transformedData.map((entry, index) => {
-              const fill = entry.isPositive ? '#009a33' : '#cdc8c2'
-              return (
-                <Cell key={`cell-${index}`} fill={fill} />
-              )
-            })}
+            {transformedData.map((entry, index) => (
+              <Cell key={`charge-${index}`} fill={entry.chargingValue > 0 ? '#009a33' : 'transparent'} />
+            ))}
+          </Bar>
+          {/* Discharging bars (gray, downward from 120) */}
+          <Bar
+            yAxisId="activity"
+            dataKey="dischargingValue"
+            baseValue={120}
+            radius={[0, 0, 1, 1]}
+            isAnimationActive={false}
+            barSize={7}
+          >
+            {transformedData.map((entry, index) => (
+              <Cell key={`discharge-${index}`} fill={entry.dischargingValue > 0 ? '#cdc8c2' : 'transparent'} />
+            ))}
           </Bar>
         </ComposedChart>
       </ResponsiveContainer>
