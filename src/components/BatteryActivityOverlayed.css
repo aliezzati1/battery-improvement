@@ -1,0 +1,262 @@
+.battery-activity-overlayed {
+  width: 100%;
+  min-height: 100vh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.battery-activity-header {
+  width: 100%;
+}
+
+.status-nav-container {
+  width: 100%;
+}
+
+.nav-bar-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  width: 100%;
+}
+
+.nav-left,
+.nav-right {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.nav-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+  color: black;
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+
+.arrow-left-icon,
+.question-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.battery-activity-content {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 100px;
+}
+
+.time-scope {
+  text-align: center;
+}
+
+.time-scope-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #353230;
+  letter-spacing: -0.24px;
+  margin: 0;
+}
+
+.day-selector {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid #f2efec;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.day-selector::-webkit-scrollbar {
+  display: none;
+}
+
+.day-button {
+  flex-shrink: 0;
+  padding: 8px 16px 12px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: black;
+  letter-spacing: -0.24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-button.active {
+  border-bottom-color: #009a33;
+  font-weight: 500;
+}
+
+.summary-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.metric-large {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: center;
+}
+
+.metric-value-large {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+.metric-value-large .value {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 36px;
+  color: black;
+  letter-spacing: -0.96px;
+}
+
+.metric-value-large .unit {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 26px;
+  color: black;
+  letter-spacing: -0.27px;
+}
+
+.metric-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: black;
+  letter-spacing: -0.24px;
+  margin: 0;
+  text-align: center;
+}
+
+.metrics-row {
+  display: flex;
+  gap: 56px;
+  align-items: flex-start;
+}
+
+.metric-small {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.metric-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.metric-indicator.charged {
+  background-color: #009a33;
+}
+
+.metric-indicator.discharged {
+  background-color: #cdc8c2;
+}
+
+.metric-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: flex-start;
+}
+
+.metric-content .metric-value {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 32px;
+  color: black;
+  letter-spacing: -0.7px;
+}
+
+.metric-content .metric-unit {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: black;
+  letter-spacing: -0.24px;
+}
+
+.metric-label-small {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: black;
+  letter-spacing: -0.14px;
+  margin: 0;
+}
+
+.chart-area {
+  width: 100%;
+  min-height: 300px;
+  position: relative;
+}
+
+.tab-control {
+  display: flex;
+  background-color: #f2efec;
+  border-radius: 100px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 99px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: black;
+  letter-spacing: -0.24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-button.active {
+  background-color: white;
+  font-weight: 500;
+}
