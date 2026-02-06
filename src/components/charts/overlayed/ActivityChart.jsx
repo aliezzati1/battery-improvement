@@ -4,7 +4,7 @@ import '../Chart.css'
 
 function ActivityChart({ data, cursorTime, onCursorUpdate }) {
 
-  // Calculate dynamic max values
+  // Calculate dynamic max values - center 0 in the middle
   const maxPrice = useMemo(() => {
     const max = Math.max(...data.map(d => d.spotPrice))
     if (max === 0) return 200
@@ -15,7 +15,9 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
     else if (normalized <= 2) niceMax = 2 * magnitude
     else if (normalized <= 5) niceMax = 5 * magnitude
     else niceMax = 10 * magnitude
-    return Math.max(50, niceMax)
+    const finalMax = Math.max(50, niceMax)
+    // Return symmetric domain with 0 in the middle
+    return [-finalMax, finalMax]
   }, [data])
 
   const maxActivity = useMemo(() => {
@@ -59,10 +61,10 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
           <YAxis
             yAxisId="price"
             orientation="left"
-            domain={[0, maxPrice]}
+            domain={maxPrice}
             tick={{ fill: '#353230', fontSize: 12, fontFamily: 'Inter', letterSpacing: '-0.06px' }}
             tickFormatter={(value) => {
-              if (value === 0 || value === maxPrice) return String(value)
+              if (value === 0 || value === maxPrice[1] || value === maxPrice[0]) return String(value)
               return ''
             }}
             axisLine={false}
@@ -81,6 +83,12 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
                 letterSpacing: '-0.06px'
               } 
             }}
+          />
+          <ReferenceLine 
+            yAxisId="price" 
+            y={0} 
+            stroke="#353230" 
+            strokeWidth={1} 
           />
           <YAxis
             yAxisId="activity"
@@ -123,7 +131,7 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
             fill="url(#activityPriceGradient)"
             stroke="none"
             isAnimationActive={false}
-            baseLine={0}
+            baseLine={maxPrice[0]}
           />
           <Line
             yAxisId="price"

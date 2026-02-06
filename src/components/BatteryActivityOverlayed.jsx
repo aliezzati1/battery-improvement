@@ -110,7 +110,7 @@ function BatteryActivityOverlayed({ onBack }) {
                   <div className="metric-indicator discharged"></div>
                   <div className="metric-content">
                     <span className="metric-value">{currentData.batteryActivity < 0 ? Math.abs(currentData.batteryActivity).toFixed(1).replace('.', ',') : '0'}</span>
-                    <span className="metric-unit"> kr</span>
+                    <span className="metric-unit"> {currentData.batteryActivity < 0 ? 'kWh' : 'kr'}</span>
                     <p className="metric-label-small">Discharged</p>
                   </div>
                 </div>
