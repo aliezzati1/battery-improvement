@@ -29,7 +29,17 @@ function RevenueChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorE
   }, [maxRevenue])
 
   return (
-    <div className="chart-container">
+    <div 
+      className="chart-container"
+      onMouseDown={onCursorStart}
+      onMouseMove={onCursorMove}
+      onMouseUp={onCursorEnd}
+      onMouseLeave={onCursorEnd}
+      onTouchStart={onCursorStart}
+      onTouchMove={onCursorMove}
+      onTouchEnd={onCursorEnd}
+      style={{ touchAction: 'pan-y', userSelect: 'none' }}
+    >
       <ResponsiveContainer width="100%" height={160}>
         <BarChart
           data={data}
