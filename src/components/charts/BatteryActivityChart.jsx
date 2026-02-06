@@ -111,6 +111,7 @@ function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, o
           )}
         </ComposedChart>
       </ResponsiveContainer>
+      </div>
     </div>
   )
 }
