@@ -18,16 +18,6 @@ function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, o
 
   return (
     <div className="chart-container">
-      <div
-        className="chart-overlay"
-        onMouseDown={onCursorStart}
-        onMouseMove={onCursorMove}
-        onMouseUp={onCursorEnd}
-        onMouseLeave={onCursorEnd}
-        onTouchStart={onCursorStart}
-        onTouchMove={onCursorMove}
-        onTouchEnd={onCursorEnd}
-      />
       <div className="chart-plot-area">
       <div className="chart-legend-top">
         <div className="legend-item">
