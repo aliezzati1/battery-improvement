@@ -9,11 +9,11 @@ import PerformanceCard from './PerformanceCard'
 import BottomNavigation from './BottomNavigation'
 import './BatteryDetail.css'
 
-function BatteryDetail() {
+function BatteryDetail({ onPerformanceClick }) {
   const handlePerformanceClick = () => {
-    // Placeholder for navigation to performance detail screen
-    console.log('Navigate to performance detail screen')
-    // You can implement routing here later
+    if (onPerformanceClick) {
+      onPerformanceClick()
+    }
   }
 
   return (

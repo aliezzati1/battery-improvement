@@ -1,0 +1,190 @@
+.battery-performance {
+  width: 100%;
+  min-height: 100vh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.battery-performance-header {
+  width: 100%;
+}
+
+.status-nav-container {
+  width: 100%;
+}
+
+.nav-bar-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  width: 100%;
+}
+
+.nav-left,
+.nav-right {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.nav-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+  color: black;
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+
+.arrow-left-icon,
+.question-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.battery-performance-content {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.time-scope {
+  text-align: center;
+}
+
+.time-scope-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #353230;
+  letter-spacing: -0.24px;
+  margin: 0;
+}
+
+.day-selector {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid #f2efec;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.day-selector::-webkit-scrollbar {
+  display: none;
+}
+
+.day-button {
+  flex-shrink: 0;
+  padding: 8px 16px 12px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: black;
+  letter-spacing: -0.24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-button.active {
+  border-bottom-color: #009a33;
+  font-weight: 500;
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 80px;
+}
+
+.chart-wrapper {
+  background-color: white;
+  border-radius: 4px;
+  padding: 16px;
+  cursor: move;
+  transition: opacity 0.2s;
+}
+
+.chart-wrapper.dragging {
+  opacity: 0.5;
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.chart-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+}
+
+.chart-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 26px;
+  color: black;
+  letter-spacing: -0.27px;
+  margin: 0;
+  display: inline;
+}
+
+.chart-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: black;
+  letter-spacing: -0.14px;
+  display: inline;
+}
+
+.drag-handle {
+  width: 24px;
+  height: 24px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle svg {
+  width: 24px;
+  height: 24px;
+}
