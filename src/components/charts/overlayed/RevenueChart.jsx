@@ -1,62 +1,11 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo } from 'react'
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine, Cell } from 'recharts'
 import '../Chart.css'
 
 function RevenueChart({ data, cursorTime, onCursorUpdate }) {
-  const chartRef = useRef(null)
-
-  const handleChartInteraction = (e) => {
-    if (!chartRef.current || !onCursorUpdate) return
-    
-    try {
-      if (e && e.stopPropagation) {
-        e.stopPropagation()
-      }
-      const chartContainer = chartRef.current
-      if (!chartContainer) return
-      
-      const rect = chartContainer.getBoundingClientRect()
-      if (!rect) return
-      
-      const clientX = (e && e.touches && e.touches.length > 0) ? e.touches[0].clientX : (e && e.clientX ? e.clientX : 0)
-      if (!clientX) return
-      
-      const x = clientX - rect.left
-      const chartWidth = rect.width - 60
-      
-      if (x < 30 || x > chartWidth + 30) {
-        if (onCursorUpdate) onCursorUpdate(null)
-        return
-      }
-      
-      const relativeX = x - 30
-      const hour = (relativeX / chartWidth) * 24
-      const clampedHour = Math.max(0, Math.min(23, Math.floor(hour)))
-      
-      if (onCursorUpdate) onCursorUpdate(clampedHour)
-    } catch (error) {
-      console.error('Error in handleChartInteraction:', error)
-    }
-  }
 
   return (
-    <div 
-      className="chart-container-overlayed"
-      ref={chartRef}
-      onMouseMove={(e) => {
-        if (e) {
-          e.stopPropagation()
-          handleChartInteraction(e)
-        }
-      }}
-      onMouseLeave={() => {
-        try {
-          if (onCursorUpdate) onCursorUpdate(null)
-        } catch (error) {
-          console.error('Error in onMouseLeave:', error)
-        }
-      }}
-    >
+    <div className="chart-container-overlayed">
       <ResponsiveContainer width="100%" height={300}>
         <ComposedChart
           data={data}
