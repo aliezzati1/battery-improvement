@@ -184,14 +184,6 @@ function BatteryPerformance({ onBack }) {
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDragEnd={handleDragEnd}
-                onMouseDown={handleCursorStart}
-                onMouseMove={handleCursorMove}
-                onMouseUp={handleCursorEnd}
-                onMouseLeave={handleCursorEnd}
-                onTouchStart={handleCursorStart}
-                onTouchMove={handleCursorMove}
-                onTouchEnd={handleCursorEnd}
-                style={{ touchAction: 'pan-y' }}
               >
                 <div className="chart-header">
                   <div className="chart-title-section">
@@ -216,7 +208,7 @@ function BatteryPerformance({ onBack }) {
                     </svg>
                   </div>
                 </div>
-                <ChartComponent data={dayData} cursorTime={cursorTime} />
+                <ChartComponent data={dayData} cursorTime={null} />
               </div>
             )
           })}
