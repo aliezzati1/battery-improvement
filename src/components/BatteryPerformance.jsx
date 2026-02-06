@@ -40,21 +40,33 @@ function BatteryPerformance({ onBack }) {
   }
 
   const handleDragStart = (e, index) => {
-    e.dataTransfer.effectAllowed = 'move'
-    setDraggedIndex(index)
+    try {
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = 'move'
+      }
+      setDraggedIndex(index)
+    } catch (error) {
+      console.error('Error in handleDragStart:', error)
+    }
   }
 
   const handleDragOver = (e, index) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    if (draggedIndex === null || draggedIndex === index) return
+    try {
+      e.preventDefault()
+      if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = 'move'
+      }
+      if (draggedIndex === null || draggedIndex === index) return
 
-    const newOrder = [...chartOrder]
-    const draggedItem = newOrder[draggedIndex]
-    newOrder.splice(draggedIndex, 1)
-    newOrder.splice(index, 0, draggedItem)
-    setChartOrder(newOrder)
-    setDraggedIndex(index)
+      const newOrder = [...chartOrder]
+      const draggedItem = newOrder[draggedIndex]
+      newOrder.splice(draggedIndex, 1)
+      newOrder.splice(index, 0, draggedItem)
+      setChartOrder(newOrder)
+      setDraggedIndex(index)
+    } catch (error) {
+      console.error('Error in handleDragOver:', error)
+    }
   }
 
   const handleDragEnd = () => {
@@ -180,7 +192,7 @@ function BatteryPerformance({ onBack }) {
               <div
                 key={chart.id}
                 className={`chart-wrapper ${draggedIndex === index ? 'dragging' : ''}`}
-                draggable
+                draggable={typeof window !== 'undefined' && 'ontouchstart' in window ? false : true}
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDragEnd={handleDragEnd}
