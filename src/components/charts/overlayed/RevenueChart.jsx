@@ -9,6 +9,7 @@ function RevenueChart({ data, cursorTime, onCursorUpdate }) {
     if (!chartRef.current || !onCursorUpdate) return
     
     try {
+      e.stopPropagation()
       const chartContainer = chartRef.current
       const rect = chartContainer.getBoundingClientRect()
       const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : (e.clientX || 0)
@@ -36,10 +37,13 @@ function RevenueChart({ data, cursorTime, onCursorUpdate }) {
     <div 
       className="chart-container-overlayed"
       ref={chartRef}
-      onMouseMove={handleChartInteraction}
-      onMouseLeave={() => onCursorUpdate && onCursorUpdate(null)}
-      onTouchMove={handleChartInteraction}
-      onTouchEnd={() => onCursorUpdate && onCursorUpdate(null)}
+      onMouseMove={(e) => {
+        e.stopPropagation()
+        handleChartInteraction(e)
+      }}
+      onMouseLeave={() => {
+        if (onCursorUpdate) onCursorUpdate(null)
+      }}
     >
       <ResponsiveContainer width="100%" height={300}>
         <ComposedChart
