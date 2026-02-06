@@ -18,8 +18,8 @@ function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, o
 
   return (
     <div className="chart-container">
-      <div 
-        className="chart-plot-area"
+      <div
+        className="chart-overlay"
         onMouseDown={onCursorStart}
         onMouseMove={onCursorMove}
         onMouseUp={onCursorEnd}
@@ -27,8 +27,8 @@ function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, o
         onTouchStart={onCursorStart}
         onTouchMove={onCursorMove}
         onTouchEnd={onCursorEnd}
-        style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none' }}
-      >
+      />
+      <div className="chart-plot-area">
       <div className="chart-legend-top">
         <div className="legend-item">
           <div className="legend-dot charged"></div>
