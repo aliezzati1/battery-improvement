@@ -28,17 +28,23 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
     if (!chartRef.current || !onCursorUpdate) return
     
     try {
-      e.stopPropagation()
+      if (e && e.stopPropagation) {
+        e.stopPropagation()
+      }
       const chartContainer = chartRef.current
+      if (!chartContainer) return
+      
       const rect = chartContainer.getBoundingClientRect()
-      const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : (e.clientX || 0)
+      if (!rect) return
+      
+      const clientX = (e && e.touches && e.touches.length > 0) ? e.touches[0].clientX : (e && e.clientX ? e.clientX : 0)
       if (!clientX) return
       
       const x = clientX - rect.left
       const chartWidth = rect.width - 60 // Account for margins
       
       if (x < 30 || x > chartWidth + 30) {
-        onCursorUpdate(null)
+        if (onCursorUpdate) onCursorUpdate(null)
         return
       }
       
@@ -46,7 +52,7 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
       const hour = (relativeX / chartWidth) * 24
       const clampedHour = Math.max(0, Math.min(23, Math.floor(hour)))
       
-      onCursorUpdate(clampedHour)
+      if (onCursorUpdate) onCursorUpdate(clampedHour)
     } catch (error) {
       console.error('Error in handleChartInteraction:', error)
     }
@@ -57,11 +63,17 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
       className="chart-container-overlayed"
       ref={chartRef}
       onMouseMove={(e) => {
-        e.stopPropagation()
-        handleChartInteraction(e)
+        if (e) {
+          e.stopPropagation()
+          handleChartInteraction(e)
+        }
       }}
       onMouseLeave={() => {
-        if (onCursorUpdate) onCursorUpdate(null)
+        try {
+          if (onCursorUpdate) onCursorUpdate(null)
+        } catch (error) {
+          console.error('Error in onMouseLeave:', error)
+        }
       }}
     >
       <ResponsiveContainer width="100%" height={300}>
