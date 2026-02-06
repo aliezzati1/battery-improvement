@@ -38,7 +38,7 @@ function RevenueChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorE
       onTouchStart={onCursorStart}
       onTouchMove={onCursorMove}
       onTouchEnd={onCursorEnd}
-      style={{ touchAction: 'pan-y', userSelect: 'none' }}
+      style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none' }}
     >
       <ResponsiveContainer width="100%" height={160}>
         <BarChart

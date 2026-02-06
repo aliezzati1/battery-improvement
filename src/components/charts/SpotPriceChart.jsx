@@ -28,7 +28,7 @@ function SpotPriceChart({ data, cursorTime, onCursorStart, onCursorMove, onCurso
       onTouchStart={onCursorStart}
       onTouchMove={onCursorMove}
       onTouchEnd={onCursorEnd}
-      style={{ touchAction: 'pan-y', userSelect: 'none' }}
+      style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none' }}
     >
       <ResponsiveContainer width="100%" height={160}>
         <ComposedChart

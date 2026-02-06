@@ -13,7 +13,7 @@ function BatterySOCChart({ data, cursorTime, onCursorStart, onCursorMove, onCurs
       onTouchStart={onCursorStart}
       onTouchMove={onCursorMove}
       onTouchEnd={onCursorEnd}
-      style={{ touchAction: 'pan-y', userSelect: 'none' }}
+      style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none' }}
     >
       <ResponsiveContainer width="100%" height={160}>
         <LineChart

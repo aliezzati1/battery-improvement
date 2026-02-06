@@ -27,7 +27,7 @@ function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, o
         onTouchStart={onCursorStart}
         onTouchMove={onCursorMove}
         onTouchEnd={onCursorEnd}
-        style={{ touchAction: 'pan-y', userSelect: 'none' }}
+        style={{ touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none' }}
       >
       <div className="chart-legend-top">
         <div className="legend-item">
