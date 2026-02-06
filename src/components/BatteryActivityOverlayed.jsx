@@ -24,8 +24,13 @@ function BatteryActivityOverlayed({ onBack }) {
   // Get data for selected day
   const dayData = generateMockDataForDay(selectedDay)
 
-  // Calculate summary metrics based on cursorTime or default to first hour
-  const currentTimeIndex = cursorTime !== null ? cursorTime : 0
+  // Calculate summary metrics based on cursorTime or find hour with activity
+  const currentTimeIndex = useMemo(() => {
+    if (cursorTime !== null) return cursorTime
+    // Find first hour with activity, or default to hour 0
+    const activeHour = dayData.findIndex(d => d.batteryActivity !== 0)
+    return activeHour >= 0 ? activeHour : 0
+  }, [cursorTime, dayData])
   const currentData = dayData[currentTimeIndex] || dayData[0]
 
   // Format time range (e.g., "09:00-09:30")
