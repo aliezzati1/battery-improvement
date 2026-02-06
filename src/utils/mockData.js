@@ -9,10 +9,11 @@ export function generateMockDataForDay(dayOffset) {
   
   // Generate spot prices - varies by day
   // Pattern: low at night, peak during midday
+  // Minimum price is 10 öre/kWh (never zero)
   const spotPrices = hours.map((hour, i) => {
     const h = parseInt(hour)
-    let basePrice = 0
-    if (h < 6) basePrice = 0
+    let basePrice = 10 // Start from minimum of 10 instead of 0
+    if (h < 6) basePrice = 10 + Math.random() * 10 // 10-20 during night
     else if (h < 10) basePrice = 20 + h * 10
     else if (h < 14) basePrice = 60 + (h - 10) * 30
     else if (h < 18) basePrice = 180 - (h - 14) * 5
@@ -21,7 +22,7 @@ export function generateMockDataForDay(dayOffset) {
     
     // Add day variation
     const variation = Math.sin((daySeed + i) * 0.1) * 20
-    return Math.max(0, basePrice * priceMultiplier + variation)
+    return Math.max(10, basePrice * priceMultiplier + variation) // Ensure minimum is 10
   })
 
   // Generate battery activity (kWh) - charging at low prices, discharging at high

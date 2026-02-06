@@ -5,8 +5,10 @@ import '../Chart.css'
 function ActivityChart({ data, cursorTime, onCursorUpdate }) {
 
   // Calculate dynamic max values - center 0 in the middle
+  // Spot prices are always positive (minimum 10), but axis is centered at 0
   const maxPrice = useMemo(() => {
     const max = Math.max(...data.map(d => d.spotPrice))
+    const min = Math.min(...data.map(d => d.spotPrice))
     if (max === 0) return [-200, 200]
     const magnitude = Math.pow(10, Math.floor(Math.log10(max)))
     const normalized = max / magnitude
@@ -17,6 +19,7 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
     else niceMax = 10 * magnitude
     const finalMax = Math.max(50, niceMax)
     // Return symmetric domain with 0 in the middle
+    // This ensures 0 is centered even though all prices are positive
     return [-finalMax, finalMax]
   }, [data])
 
