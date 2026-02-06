@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useRef } from 'react'
 import StatusBar from './StatusBar'
 import NavigationBar from './NavigationBar'
 import SpotPriceChart from './charts/SpotPriceChart'
@@ -17,6 +17,9 @@ function BatteryPerformance({ onBack }) {
     { id: 'battery-activity', component: BatteryActivityChart, title: 'Battery activity', subtitle: '(kWh)' },
   ])
   const [draggedIndex, setDraggedIndex] = useState(null)
+  const [cursorTime, setCursorTime] = useState(null) // Time in hours (0-23) for the vertical line
+  const [isDraggingCursor, setIsDraggingCursor] = useState(false)
+  const chartsContainerRef = useRef(null)
 
   // Generate last 30 days
   const days = Array.from({ length: 30 }, (_, i) => {
@@ -56,6 +59,48 @@ function BatteryPerformance({ onBack }) {
 
   const handleDragEnd = () => {
     setDraggedIndex(null)
+  }
+
+  // Handle cursor line dragging
+  const handleCursorStart = (e) => {
+    setIsDraggingCursor(true)
+    updateCursorPosition(e)
+  }
+
+  const handleCursorMove = (e) => {
+    if (isDraggingCursor) {
+      updateCursorPosition(e)
+    }
+  }
+
+  const handleCursorEnd = () => {
+    setIsDraggingCursor(false)
+  }
+
+  const updateCursorPosition = (e) => {
+    if (!chartsContainerRef.current) return
+    
+    const container = chartsContainerRef.current
+    const rect = container.getBoundingClientRect()
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const x = clientX - rect.left
+    
+    // Find the first chart to get its width
+    const firstChart = container.querySelector('.chart-wrapper')
+    if (!firstChart) return
+    
+    const chartRect = firstChart.getBoundingClientRect()
+    const chartWidth = chartRect.width - 64 // Account for padding (32px each side)
+    const chartLeft = 32 // Left padding
+    
+    if (x < chartLeft || x > chartLeft + chartWidth) return
+    
+    // Convert X position to hour (0-23)
+    const relativeX = x - chartLeft
+    const hour = (relativeX / chartWidth) * 24
+    const clampedHour = Math.max(0, Math.min(23, Math.round(hour)))
+    
+    setCursorTime(clampedHour)
   }
 
   return (
@@ -100,7 +145,17 @@ function BatteryPerformance({ onBack }) {
           ))}
         </div>
 
-        <div className="charts-container">
+        <div 
+          className="charts-container"
+          ref={chartsContainerRef}
+          onMouseDown={handleCursorStart}
+          onMouseMove={handleCursorMove}
+          onMouseUp={handleCursorEnd}
+          onMouseLeave={handleCursorEnd}
+          onTouchStart={handleCursorStart}
+          onTouchMove={handleCursorMove}
+          onTouchEnd={handleCursorEnd}
+        >
           {chartOrder.map((chart, index) => {
             const ChartComponent = chart.component
             return (
@@ -135,7 +190,7 @@ function BatteryPerformance({ onBack }) {
                     </svg>
                   </div>
                 </div>
-                <ChartComponent data={dayData} />
+                <ChartComponent data={dayData} cursorTime={cursorTime} />
               </div>
             )
           })}
