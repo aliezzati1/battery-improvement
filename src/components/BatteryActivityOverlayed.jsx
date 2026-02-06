@@ -126,14 +126,14 @@ function BatteryActivityOverlayed({ onBack }) {
                 <p className="metric-label">{formatTimeRange(currentTimeIndex)}</p>
               </div>
               <div className="metrics-row">
-                <div className="metric-small">
-                  <div className="metric-indicator charged"></div>
-                  <div className="metric-content">
-                    <span className="metric-value">{currentData.revenue > 0 ? currentData.revenue.toFixed(0) : '0'}</span>
-                    <span className="metric-unit"> kr</span>
-                    <p className="metric-label-small">Earned</p>
-                  </div>
+              <div className="metric-small">
+                <div className="metric-indicator earned"></div>
+                <div className="metric-content">
+                  <span className="metric-value">{currentData.revenue > 0 ? currentData.revenue.toFixed(0) : '0'}</span>
+                  <span className="metric-unit"> kr</span>
+                  <p className="metric-label-small">Earned</p>
                 </div>
+              </div>
               </div>
             </>
           )}

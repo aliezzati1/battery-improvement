@@ -107,13 +107,12 @@ function RevenueChart({ data, cursorTime, onCursorUpdate }) {
             radius={[1, 1, 0, 0]}
             isAnimationActive={false}
             barSize={2}
-            fill="#b2ffbf"
-            opacity={0.6}
           >
             {data.map((entry, index) => (
               <Cell 
                 key={`cell-${index}`} 
                 fill={entry.revenue > 0 ? '#b2ffbf' : 'transparent'} 
+                opacity={entry.revenue > 0 ? 0.6 : 0}
               />
             ))}
           </Bar>

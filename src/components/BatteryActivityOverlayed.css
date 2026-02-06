@@ -191,6 +191,10 @@
   background-color: #cdc8c2;
 }
 
+.metric-indicator.earned {
+  background-color: #009a33;
+}
+
 .metric-content {
   display: flex;
   flex-direction: column;
