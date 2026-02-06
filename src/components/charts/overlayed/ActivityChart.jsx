@@ -7,7 +7,7 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
   // Calculate dynamic max values - center 0 in the middle
   const maxPrice = useMemo(() => {
     const max = Math.max(...data.map(d => d.spotPrice))
-    if (max === 0) return 200
+    if (max === 0) return [-200, 200]
     const magnitude = Math.pow(10, Math.floor(Math.log10(max)))
     const normalized = max / magnitude
     let niceMax
