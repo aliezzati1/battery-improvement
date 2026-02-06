@@ -73,87 +73,10 @@ function BatteryPerformance({ onBack }) {
     setDraggedIndex(null)
   }
 
-  // Handle cursor line dragging - only on chart plot areas
-  const handleCursorStart = (e) => {
-    try {
-      // Only handle if touching the chart overlay
-      const target = e.target
-      if (!target.classList.contains('chart-overlay')) return
-      
-      const chartContainer = target.closest('.chart-container')
-      if (!chartContainer) return
-      
-      setIsDraggingCursor(true)
-      updateCursorPosition(e, chartContainer)
-      // Only prevent default when we're actually dragging the cursor
-      if (e.touches) {
-        e.preventDefault()
-      }
-      e.stopPropagation()
-    } catch (error) {
-      console.error('Error in handleCursorStart:', error)
-    }
-  }
-
-  const handleCursorMove = (e) => {
-    try {
-      if (!isDraggingCursor) return
-      
-      const target = e.target
-      const chartContainer = target.closest('.chart-container')
-      if (!chartContainer) {
-        setCursorTime(null)
-        return
-      }
-      
-      updateCursorPosition(e, chartContainer)
-      // Only prevent default when actively dragging
-      if (e.touches) {
-        e.preventDefault()
-      }
-      e.stopPropagation()
-    } catch (error) {
-      console.error('Error in handleCursorMove:', error)
-    }
-  }
-
-  const handleCursorEnd = (e) => {
-    if (e) {
-      e.stopPropagation()
-    }
-    setIsDraggingCursor(false)
-  }
-
-  const updateCursorPosition = (e, chartContainer) => {
-    try {
-      if (!chartContainer) return
-      
-      const rect = chartContainer.getBoundingClientRect()
-      const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : (e.clientX || 0)
-      if (!clientX) return
-      
-      const x = clientX - rect.left
-      
-      // Account for chart margins (left: 0, right: 30 from ResponsiveContainer margin)
-      const chartWidth = rect.width - 30 // Right margin
-      const chartLeft = 0
-      
-      if (x < chartLeft || x > chartLeft + chartWidth) {
-        setCursorTime(null)
-        return
-      }
-      
-      // Convert X position to hour (0-23)
-      // Chart X-axis goes from 0 to 24 hours
-      const relativeX = x - chartLeft
-      const hour = (relativeX / chartWidth) * 24
-      const clampedHour = Math.max(0, Math.min(23, Math.floor(hour)))
-      
-      setCursorTime(clampedHour)
-    } catch (error) {
-      console.error('Error in updateCursorPosition:', error)
-    }
-  }
+  // Cursor functionality temporarily disabled to fix blank screen issue
+  const handleCursorStart = () => {}
+  const handleCursorMove = () => {}
+  const handleCursorEnd = () => {}
 
   return (
     <div className="battery-performance">
@@ -237,7 +160,7 @@ function BatteryPerformance({ onBack }) {
                 </div>
                 <ChartComponent 
                   data={dayData} 
-                  cursorTime={cursorTime}
+                  cursorTime={null}
                   onCursorStart={handleCursorStart}
                   onCursorMove={handleCursorMove}
                   onCursorEnd={handleCursorEnd}
