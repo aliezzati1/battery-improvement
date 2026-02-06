@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
 import './Chart.css'
 
-function RevenueChart({ data, cursorTime }) {
+function RevenueChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorEnd }) {
   // Calculate dynamic max value from data
   const maxRevenue = useMemo(() => {
     const max = Math.max(...data.map(d => d.revenue))

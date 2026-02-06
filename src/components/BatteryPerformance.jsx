@@ -73,16 +73,17 @@ function BatteryPerformance({ onBack }) {
     setDraggedIndex(null)
   }
 
-  // Handle cursor line dragging
+  // Handle cursor line dragging - only on chart plot areas
   const handleCursorStart = (e) => {
     try {
-      // Only prevent default if we're actually on a chart
+      // Only handle if touching the chart container (plot area)
       const target = e.target
-      if (target.closest('.chart-wrapper')) {
-        e.preventDefault()
-        setIsDraggingCursor(true)
-        updateCursorPosition(e)
-      }
+      const chartContainer = target.closest('.chart-container')
+      if (!chartContainer) return
+      
+      setIsDraggingCursor(true)
+      updateCursorPosition(e, chartContainer)
+      e.stopPropagation()
     } catch (error) {
       console.error('Error in handleCursorStart:', error)
     }
@@ -90,10 +91,17 @@ function BatteryPerformance({ onBack }) {
 
   const handleCursorMove = (e) => {
     try {
-      if (isDraggingCursor) {
-        e.preventDefault()
-        updateCursorPosition(e)
+      if (!isDraggingCursor) return
+      
+      const target = e.target
+      const chartContainer = target.closest('.chart-container')
+      if (!chartContainer) {
+        setCursorTime(null)
+        return
       }
+      
+      updateCursorPosition(e, chartContainer)
+      e.stopPropagation()
     } catch (error) {
       console.error('Error in handleCursorMove:', error)
     }
@@ -103,25 +111,19 @@ function BatteryPerformance({ onBack }) {
     setIsDraggingCursor(false)
   }
 
-  const updateCursorPosition = (e) => {
+  const updateCursorPosition = (e, chartContainer) => {
     try {
-      if (!chartsContainerRef.current) return
+      if (!chartContainer) return
       
-      const container = chartsContainerRef.current
-      const rect = container.getBoundingClientRect()
+      const rect = chartContainer.getBoundingClientRect()
       const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : (e.clientX || 0)
       if (!clientX) return
       
       const x = clientX - rect.left
       
-      // Find the first chart wrapper to get its width
-      const firstChart = container.querySelector('.chart-wrapper')
-      if (!firstChart) return
-      
-      const chartRect = firstChart.getBoundingClientRect()
-      // Account for padding: 12px on each side = 24px total
-      const chartWidth = chartRect.width - 24
-      const chartLeft = chartRect.left - rect.left + 12 // Left padding offset
+      // Account for chart margins (left: 0, right: 30 from ResponsiveContainer margin)
+      const chartWidth = rect.width - 30 // Right margin
+      const chartLeft = 0
       
       if (x < chartLeft || x > chartLeft + chartWidth) {
         setCursorTime(null)
@@ -220,7 +222,13 @@ function BatteryPerformance({ onBack }) {
                     </svg>
                   </div>
                 </div>
-                <ChartComponent data={dayData} cursorTime={null} />
+                <ChartComponent 
+                  data={dayData} 
+                  cursorTime={cursorTime}
+                  onCursorStart={handleCursorStart}
+                  onCursorMove={handleCursorMove}
+                  onCursorEnd={handleCursorEnd}
+                />
               </div>
             )
           })}

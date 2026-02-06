@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts'
 import './Chart.css'
 
-function SpotPriceChart({ data, cursorTime }) {
+function SpotPriceChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorEnd }) {
   // Calculate dynamic max value from data
   const maxPrice = useMemo(() => {
     const max = Math.max(...data.map(d => d.spotPrice))
@@ -19,7 +19,17 @@ function SpotPriceChart({ data, cursorTime }) {
   }, [data])
 
   return (
-    <div className="chart-container">
+    <div 
+      className="chart-container"
+      onMouseDown={onCursorStart}
+      onMouseMove={onCursorMove}
+      onMouseUp={onCursorEnd}
+      onMouseLeave={onCursorEnd}
+      onTouchStart={onCursorStart}
+      onTouchMove={onCursorMove}
+      onTouchEnd={onCursorEnd}
+      style={{ touchAction: 'pan-y', userSelect: 'none' }}
+    >
       <ResponsiveContainer width="100%" height={160}>
         <ComposedChart
           data={data}

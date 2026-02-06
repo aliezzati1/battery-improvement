@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
 import './Chart.css'
 
-function BatteryActivityChart({ data, cursorTime }) {
+function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorEnd }) {
   // Calculate dynamic domain based on data
   const maxAbs = useMemo(() => {
     const max = Math.max(...data.map(d => Math.abs(d.batteryActivity)))
@@ -18,6 +18,17 @@ function BatteryActivityChart({ data, cursorTime }) {
 
   return (
     <div className="chart-container">
+      <div 
+        className="chart-plot-area"
+        onMouseDown={onCursorStart}
+        onMouseMove={onCursorMove}
+        onMouseUp={onCursorEnd}
+        onMouseLeave={onCursorEnd}
+        onTouchStart={onCursorStart}
+        onTouchMove={onCursorMove}
+        onTouchEnd={onCursorEnd}
+        style={{ touchAction: 'pan-y', userSelect: 'none' }}
+      >
       <div className="chart-legend-top">
         <div className="legend-item">
           <div className="legend-dot charged"></div>

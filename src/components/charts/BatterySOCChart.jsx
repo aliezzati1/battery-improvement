@@ -2,9 +2,19 @@ import React from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts'
 import './Chart.css'
 
-function BatterySOCChart({ data, cursorTime }) {
+function BatterySOCChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorEnd }) {
   return (
-    <div className="chart-container">
+    <div 
+      className="chart-container"
+      onMouseDown={onCursorStart}
+      onMouseMove={onCursorMove}
+      onMouseUp={onCursorEnd}
+      onMouseLeave={onCursorEnd}
+      onTouchStart={onCursorStart}
+      onTouchMove={onCursorMove}
+      onTouchEnd={onCursorEnd}
+      style={{ touchAction: 'pan-y', userSelect: 'none' }}
+    >
       <ResponsiveContainer width="100%" height={160}>
         <LineChart
           data={data}
