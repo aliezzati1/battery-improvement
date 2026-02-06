@@ -76,16 +76,20 @@ function BatteryPerformance({ onBack }) {
   // Handle cursor line dragging - only on chart plot areas
   const handleCursorStart = (e) => {
     try {
-      e.preventDefault()
-      e.stopPropagation()
-      
-      // Only handle if touching the chart container (plot area)
+      // Only handle if touching the chart overlay
       const target = e.target
+      if (!target.classList.contains('chart-overlay')) return
+      
       const chartContainer = target.closest('.chart-container')
       if (!chartContainer) return
       
       setIsDraggingCursor(true)
       updateCursorPosition(e, chartContainer)
+      // Only prevent default when we're actually dragging the cursor
+      if (e.touches) {
+        e.preventDefault()
+      }
+      e.stopPropagation()
     } catch (error) {
       console.error('Error in handleCursorStart:', error)
     }
@@ -95,9 +99,6 @@ function BatteryPerformance({ onBack }) {
     try {
       if (!isDraggingCursor) return
       
-      e.preventDefault()
-      e.stopPropagation()
-      
       const target = e.target
       const chartContainer = target.closest('.chart-container')
       if (!chartContainer) {
@@ -106,6 +107,11 @@ function BatteryPerformance({ onBack }) {
       }
       
       updateCursorPosition(e, chartContainer)
+      // Only prevent default when actively dragging
+      if (e.touches) {
+        e.preventDefault()
+      }
+      e.stopPropagation()
     } catch (error) {
       console.error('Error in handleCursorMove:', error)
     }
