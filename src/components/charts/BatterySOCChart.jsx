@@ -65,8 +65,9 @@ function BatterySOCChart({ data, cursorTime, onCursorStart, onCursorMove, onCurs
             <ReferenceLine
               x={String(cursorTime).padStart(2, '0')}
               stroke="#000000"
-              strokeWidth={1}
+              strokeWidth={2}
               isFront={true}
+              strokeDasharray="0"
             />
           )}
         </LineChart>
