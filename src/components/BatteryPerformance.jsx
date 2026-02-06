@@ -85,20 +85,25 @@ function BatteryPerformance({ onBack }) {
     const clientX = e.touches ? e.touches[0].clientX : e.clientX
     const x = clientX - rect.left
     
-    // Find the first chart to get its width
+    // Find the first chart wrapper to get its width
     const firstChart = container.querySelector('.chart-wrapper')
     if (!firstChart) return
     
     const chartRect = firstChart.getBoundingClientRect()
-    const chartWidth = chartRect.width - 64 // Account for padding (32px each side)
-    const chartLeft = 32 // Left padding
+    // Account for padding: 12px on each side = 24px total
+    const chartWidth = chartRect.width - 24
+    const chartLeft = chartRect.left - rect.left + 12 // Left padding offset
     
-    if (x < chartLeft || x > chartLeft + chartWidth) return
+    if (x < chartLeft || x > chartLeft + chartWidth) {
+      setCursorTime(null)
+      return
+    }
     
     // Convert X position to hour (0-23)
+    // Chart X-axis goes from 0 to 24 hours
     const relativeX = x - chartLeft
     const hour = (relativeX / chartWidth) * 24
-    const clampedHour = Math.max(0, Math.min(23, Math.round(hour)))
+    const clampedHour = Math.max(0, Math.min(23, Math.floor(hour)))
     
     setCursorTime(clampedHour)
   }
@@ -155,6 +160,7 @@ function BatteryPerformance({ onBack }) {
           onTouchStart={handleCursorStart}
           onTouchMove={handleCursorMove}
           onTouchEnd={handleCursorEnd}
+          style={{ touchAction: 'none' }}
         >
           {chartOrder.map((chart, index) => {
             const ChartComponent = chart.component
