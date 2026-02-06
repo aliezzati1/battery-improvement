@@ -10,11 +10,9 @@ function BatteryActivityChart({ data }) {
     return Math.max(4, Math.ceil(max * 2) / 2)
   }, [data])
 
-  // Transform data: positive values go up from 0, negative go down from 0
+  // Use data directly - positive values will go up, negative will go down
   const transformedData = data.map(d => ({
     ...d,
-    chargingValue: d.batteryActivity >= 0 ? d.batteryActivity : 0,
-    dischargingValue: d.batteryActivity < 0 ? Math.abs(d.batteryActivity) : 0,
     isPositive: d.batteryActivity >= 0,
   }))
 
@@ -75,31 +73,21 @@ function BatteryActivityChart({ data }) {
             stroke="#353230" 
             strokeWidth={1} 
           />
-          {/* Charging bars (green, upward from 0) */}
+          {/* Single bar series - positive values go up (green), negative go down (gray) */}
           <Bar
             yAxisId="activity"
-            dataKey="chargingValue"
+            dataKey="batteryActivity"
             baseValue={0}
-            radius={[1, 1, 0, 0]}
+            radius={[1, 1, 1, 1]}
             isAnimationActive={false}
             barSize={7}
           >
-            {transformedData.map((entry, index) => (
-              <Cell key={`charge-${index}`} fill={entry.chargingValue > 0 ? '#009a33' : 'transparent'} />
-            ))}
-          </Bar>
-          {/* Discharging bars (gray, downward from 0) */}
-          <Bar
-            yAxisId="activity"
-            dataKey="dischargingValue"
-            baseValue={0}
-            radius={[0, 0, 1, 1]}
-            isAnimationActive={false}
-            barSize={7}
-          >
-            {transformedData.map((entry, index) => (
-              <Cell key={`discharge-${index}`} fill={entry.dischargingValue > 0 ? '#cdc8c2' : 'transparent'} />
-            ))}
+            {transformedData.map((entry, index) => {
+              const fill = entry.isPositive ? '#009a33' : '#cdc8c2'
+              return (
+                <Cell key={`cell-${index}`} fill={fill} />
+              )
+            })}
           </Bar>
         </ComposedChart>
       </ResponsiveContainer>
