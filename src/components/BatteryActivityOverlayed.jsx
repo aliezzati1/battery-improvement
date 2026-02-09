@@ -142,7 +142,7 @@ function BatteryActivityOverlayed({ onBack }) {
                   <span className="value">{spotPriceValue.toFixed(1).replace('.', ',')}</span>
                   <span className="unit"> öre/kWh</span>
                 </div>
-                <p className="metric-label">{formatTimeRange()}</p>
+                <p className="metric-label">Avg. spot price</p>
               </div>
               <div className="metrics-row">
                 <div className="metric-small">
