@@ -28,21 +28,34 @@ function BatteryActivityOverlayed({ onBack }) {
   const currentTimeIndex = useMemo(() => {
     if (cursorTime !== null) return cursorTime
     
-    // Find the hour with the most significant activity (largest absolute value)
-    // This ensures we show data that matches what's visually prominent in the chart
-    let maxActivityHour = 0
-    let maxActivityValue = 0
+    // Find hours with charging and discharging activity
+    let maxChargingHour = -1
+    let maxChargingValue = 0
+    let maxDischargingHour = -1
+    let maxDischargingValue = 0
     
     dayData.forEach((d, index) => {
-      const absActivity = Math.abs(d.batteryActivity)
-      if (absActivity > maxActivityValue) {
-        maxActivityValue = absActivity
-        maxActivityHour = index
+      const activity = d.batteryActivity
+      if (activity > 0 && activity > maxChargingValue) {
+        maxChargingValue = activity
+        maxChargingHour = index
+      } else if (activity < 0 && Math.abs(activity) > maxDischargingValue) {
+        maxDischargingValue = Math.abs(activity)
+        maxDischargingHour = index
       }
     })
     
-    // If no activity found, default to hour 0
-    return maxActivityValue > 0 ? maxActivityHour : 0
+    // Prioritize showing charging activity if it exists (since charging bars are often more visible)
+    // This ensures "Charged" shows a value when green bars are visible
+    if (maxChargingHour >= 0) {
+      return maxChargingHour
+    }
+    // Fall back to discharging if no charging exists
+    if (maxDischargingHour >= 0) {
+      return maxDischargingHour
+    }
+    // Default to hour 0 if no activity
+    return 0
   }, [cursorTime, dayData])
   
   // Get data for the selected time window - ensure consistency
