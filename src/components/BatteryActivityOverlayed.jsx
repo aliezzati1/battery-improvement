@@ -27,12 +27,22 @@ function BatteryActivityOverlayed({ onBack }) {
   // Calculate summary metrics based on cursorTime or find hour with activity
   const currentTimeIndex = useMemo(() => {
     if (cursorTime !== null) return cursorTime
-    // Find first hour with discharging activity (negative), or charging activity, or default to hour 0
-    const dischargingHour = dayData.findIndex(d => d.batteryActivity < 0)
-    if (dischargingHour >= 0) return dischargingHour
-    const chargingHour = dayData.findIndex(d => d.batteryActivity > 0)
-    if (chargingHour >= 0) return chargingHour
-    return 0
+    
+    // Find the hour with the most significant activity (largest absolute value)
+    // This ensures we show data that matches what's visually prominent in the chart
+    let maxActivityHour = 0
+    let maxActivityValue = 0
+    
+    dayData.forEach((d, index) => {
+      const absActivity = Math.abs(d.batteryActivity)
+      if (absActivity > maxActivityValue) {
+        maxActivityValue = absActivity
+        maxActivityHour = index
+      }
+    })
+    
+    // If no activity found, default to hour 0
+    return maxActivityValue > 0 ? maxActivityHour : 0
   }, [cursorTime, dayData])
   const currentData = dayData[currentTimeIndex] || dayData[0]
 
