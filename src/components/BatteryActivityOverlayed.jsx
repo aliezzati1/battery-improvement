@@ -44,7 +44,23 @@ function BatteryActivityOverlayed({ onBack }) {
     // If no activity found, default to hour 0
     return maxActivityValue > 0 ? maxActivityHour : 0
   }, [cursorTime, dayData])
+  
+  // Get data for the selected time window - ensure consistency
   const currentData = dayData[currentTimeIndex] || dayData[0]
+  
+  // Calculate charged/discharged values directly from chart data for the selected hour
+  // This ensures summary metrics always match what's visible in the chart
+  const chargedValue = useMemo(() => {
+    const activity = currentData.batteryActivity
+    // Charged = positive battery activity, or 0 if negative/zero
+    return activity > 0 ? activity : 0
+  }, [currentData])
+  
+  const dischargedValue = useMemo(() => {
+    const activity = currentData.batteryActivity
+    // Discharged = absolute value of negative battery activity, or 0 if positive/zero
+    return activity < 0 ? Math.abs(activity) : 0
+  }, [currentData])
 
   // Format time range (e.g., "09:00-09:30")
   const formatTimeRange = (hour) => {
@@ -119,7 +135,7 @@ function BatteryActivityOverlayed({ onBack }) {
                 <div className="metric-small">
                   <div className="metric-indicator charged"></div>
                   <div className="metric-content">
-                    <span className="metric-value">{currentData.batteryActivity > 0 ? currentData.batteryActivity.toFixed(1).replace('.', ',') : '0'}</span>
+                    <span className="metric-value">{chargedValue > 0 ? chargedValue.toFixed(1).replace('.', ',') : '0'}</span>
                     <span className="metric-unit"> kWh</span>
                     <p className="metric-label-small">Charged</p>
                   </div>
@@ -127,7 +143,7 @@ function BatteryActivityOverlayed({ onBack }) {
                 <div className="metric-small">
                   <div className="metric-indicator discharged"></div>
                   <div className="metric-content">
-                    <span className="metric-value">{currentData.batteryActivity < 0 ? Math.abs(currentData.batteryActivity).toFixed(1).replace('.', ',') : '0'}</span>
+                    <span className="metric-value">{dischargedValue > 0 ? dischargedValue.toFixed(1).replace('.', ',') : '0'}</span>
                     <span className="metric-unit"> kWh</span>
                     <p className="metric-label-small">Discharged</p>
                   </div>

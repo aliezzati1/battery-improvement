@@ -27,17 +27,26 @@ export function generateMockDataForDay(dayOffset) {
 
   // Generate battery activity (kWh) - charging at low prices, discharging at high
   // Varies more between days
+  // CRITICAL: Charging and discharging must never occur in the same hour
+  // Each hour must be either charging (positive), discharging (negative), or idle (zero)
   const batteryActivity = hours.map((hour, i) => {
     const price = spotPrices[i]
     if (price < 30) {
       // Charging during low prices - varies by day
+      // Ensure minimum charge value is > 0 to avoid rounding to zero
       const baseCharge = 0.5 + Math.random() * 2 // 0.5 to 2.5 kWh
-      return baseCharge * activityMultiplier
+      const chargeValue = baseCharge * activityMultiplier
+      // Round to 1 decimal place, ensure it's always positive
+      return Math.max(0.1, Math.round(chargeValue * 10) / 10)
     } else if (price > 150) {
       // Discharging during high prices - varies by day
+      // Ensure minimum discharge value is < 0 to avoid rounding to zero
       const baseDischarge = -(1 + Math.random() * 3) // -1 to -4 kWh
-      return baseDischarge * activityMultiplier
+      const dischargeValue = baseDischarge * activityMultiplier
+      // Round to 1 decimal place, ensure it's always negative
+      return Math.min(-0.1, Math.round(dischargeValue * 10) / 10)
     }
+    // No activity - explicitly return 0
     return 0
   })
 
