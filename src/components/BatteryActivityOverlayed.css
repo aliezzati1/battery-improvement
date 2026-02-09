@@ -242,6 +242,7 @@
   border-radius: 100px;
   padding: 4px;
   gap: 4px;
+  margin-top: -16px;
 }
 
 .tab-button {
