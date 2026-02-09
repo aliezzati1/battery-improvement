@@ -68,12 +68,14 @@
   padding-top: 20px;
 }
 
-.chart-legend {
+.performance-chart .chart-legend {
   display: flex;
   gap: 24px;
   justify-content: flex-end;
   align-items: center;
-  margin-top: 8px;
+  margin-top: 4px;
+  width: 100%;
+  padding-right: 0;
 }
 
 .legend-item {
