@@ -71,11 +71,10 @@
 .performance-chart .chart-legend {
   display: flex;
   gap: 24px;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   margin-top: 4px;
   width: 100%;
-  padding-right: 0;
 }
 
 .legend-item {
