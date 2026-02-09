@@ -71,9 +71,9 @@
 .chart-legend {
   display: flex;
   gap: 24px;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 .legend-item {
