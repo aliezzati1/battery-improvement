@@ -24,63 +24,63 @@ function BatteryActivityOverlayed({ onBack }) {
   // Get data for selected day
   const dayData = generateMockDataForDay(selectedDay)
 
-  // Calculate summary metrics based on cursorTime or find hour with activity
-  const currentTimeIndex = useMemo(() => {
-    if (cursorTime !== null) return cursorTime
+  // Calculate daily totals and averages
+  const dailyMetrics = useMemo(() => {
+    // Calculate average spot price for the day
+    const avgSpotPrice = dayData.reduce((sum, d) => sum + d.spotPrice, 0) / dayData.length
     
-    // Find hours with charging and discharging activity
-    let maxChargingHour = -1
-    let maxChargingValue = 0
-    let maxDischargingHour = -1
-    let maxDischargingValue = 0
+    // Calculate total charged (sum of all positive batteryActivity values)
+    const totalCharged = dayData.reduce((sum, d) => {
+      return sum + (d.batteryActivity > 0 ? d.batteryActivity : 0)
+    }, 0)
     
-    dayData.forEach((d, index) => {
-      const activity = d.batteryActivity
-      if (activity > 0 && activity > maxChargingValue) {
-        maxChargingValue = activity
-        maxChargingHour = index
-      } else if (activity < 0 && Math.abs(activity) > maxDischargingValue) {
-        maxDischargingValue = Math.abs(activity)
-        maxDischargingHour = index
-      }
-    })
+    // Calculate total discharged (sum of absolute values of all negative batteryActivity values)
+    const totalDischarged = dayData.reduce((sum, d) => {
+      return sum + (d.batteryActivity < 0 ? Math.abs(d.batteryActivity) : 0)
+    }, 0)
     
-    // Prioritize showing charging activity if it exists (since charging bars are often more visible)
-    // This ensures "Charged" shows a value when green bars are visible
-    if (maxChargingHour >= 0) {
-      return maxChargingHour
+    return {
+      avgSpotPrice,
+      totalCharged,
+      totalDischarged
     }
-    // Fall back to discharging if no charging exists
-    if (maxDischargingHour >= 0) {
-      return maxDischargingHour
+  }, [dayData])
+  
+  // If cursorTime is set, use that hour's data; otherwise use daily averages
+  const currentTimeIndex = cursorTime !== null ? cursorTime : null
+  const currentData = currentTimeIndex !== null ? dayData[currentTimeIndex] : null
+
+  // Format time range - show daily average or specific hour
+  const formatTimeRange = () => {
+    if (currentTimeIndex !== null) {
+      const start = String(currentTimeIndex).padStart(2, '0') + ':00'
+      const end = String(currentTimeIndex).padStart(2, '0') + ':30'
+      return `${start}-${end}`
     }
-    // Default to hour 0 if no activity
-    return 0
-  }, [cursorTime, dayData])
+    return '00:00-24:00'
+  }
   
-  // Get data for the selected time window - ensure consistency
-  const currentData = dayData[currentTimeIndex] || dayData[0]
-  
-  // Calculate charged/discharged values directly from chart data for the selected hour
-  // This ensures summary metrics always match what's visible in the chart
+  // Use daily totals for charged/discharged, or specific hour if cursor is active
   const chargedValue = useMemo(() => {
-    const activity = currentData.batteryActivity
-    // Charged = positive battery activity, or 0 if negative/zero
-    return activity > 0 ? activity : 0
-  }, [currentData])
+    if (currentData !== null) {
+      return currentData.batteryActivity > 0 ? currentData.batteryActivity : 0
+    }
+    return dailyMetrics.totalCharged
+  }, [currentData, dailyMetrics])
   
   const dischargedValue = useMemo(() => {
-    const activity = currentData.batteryActivity
-    // Discharged = absolute value of negative battery activity, or 0 if positive/zero
-    return activity < 0 ? Math.abs(activity) : 0
-  }, [currentData])
-
-  // Format time range (e.g., "09:00-09:30")
-  const formatTimeRange = (hour) => {
-    const start = String(hour).padStart(2, '0') + ':00'
-    const end = String(hour).padStart(2, '0') + ':30'
-    return `${start}-${end}`
-  }
+    if (currentData !== null) {
+      return currentData.batteryActivity < 0 ? Math.abs(currentData.batteryActivity) : 0
+    }
+    return dailyMetrics.totalDischarged
+  }, [currentData, dailyMetrics])
+  
+  const spotPriceValue = useMemo(() => {
+    if (currentData !== null) {
+      return currentData.spotPrice
+    }
+    return dailyMetrics.avgSpotPrice
+  }, [currentData, dailyMetrics])
 
   const handleDaySelect = (index) => {
     setSelectedDay(index)
@@ -139,10 +139,10 @@ function BatteryActivityOverlayed({ onBack }) {
             <>
               <div className="metric-large">
                 <div className="metric-value-large">
-                  <span className="value">{currentData.spotPrice.toFixed(1).replace('.', ',')}</span>
+                  <span className="value">{spotPriceValue.toFixed(1).replace('.', ',')}</span>
                   <span className="unit"> öre/kWh</span>
                 </div>
-                <p className="metric-label">{formatTimeRange(currentTimeIndex)}</p>
+                <p className="metric-label">{formatTimeRange()}</p>
               </div>
               <div className="metrics-row">
                 <div className="metric-small">
