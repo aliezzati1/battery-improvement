@@ -27,9 +27,12 @@ function BatteryActivityOverlayed({ onBack }) {
   // Calculate summary metrics based on cursorTime or find hour with activity
   const currentTimeIndex = useMemo(() => {
     if (cursorTime !== null) return cursorTime
-    // Find first hour with activity, or default to hour 0
-    const activeHour = dayData.findIndex(d => d.batteryActivity !== 0)
-    return activeHour >= 0 ? activeHour : 0
+    // Find first hour with discharging activity (negative), or charging activity, or default to hour 0
+    const dischargingHour = dayData.findIndex(d => d.batteryActivity < 0)
+    if (dischargingHour >= 0) return dischargingHour
+    const chargingHour = dayData.findIndex(d => d.batteryActivity > 0)
+    if (chargingHour >= 0) return chargingHour
+    return 0
   }, [cursorTime, dayData])
   const currentData = dayData[currentTimeIndex] || dayData[0]
 
