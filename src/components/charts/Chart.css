@@ -63,3 +63,34 @@
 .legend-dot.discharged {
   background-color: #cdc8c2;
 }
+
+.legend-dot.earned-money {
+  background-color: #009a33;
+}
+
+.soc-revenue-chart-container {
+  background-color: white;
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 361px;
+  margin: 0 auto;
+}
+
+.soc-revenue-chart-container .chart-container {
+  height: auto;
+  min-height: 200px;
+}
+
+.chart-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 26px;
+  color: black;
+  letter-spacing: -0.27px;
+  margin: 0;
+}

@@ -6,6 +6,8 @@ import ChargingStatusCard from './ChargingStatusCard'
 import ModeCard from './ModeCard'
 import EarningsCard from './EarningsCard'
 import PerformanceCard from './PerformanceCard'
+import SOCRevenueChart from './charts/SOCRevenueChart'
+import { generateMockDataForDay } from '../utils/mockData'
 import BottomNavigation from './BottomNavigation'
 import './BatteryDetail.css'
 
@@ -15,6 +17,9 @@ function BatteryDetail({ onPerformanceClick }) {
       onPerformanceClick()
     }
   }
+
+  // Generate mock data for yesterday (dayOffset = 0)
+  const yesterdayData = generateMockDataForDay(0)
 
   return (
     <div className="battery-detail">
@@ -33,6 +38,7 @@ function BatteryDetail({ onPerformanceClick }) {
         <ModeCard />
         <EarningsCard />
         <PerformanceCard onClick={handlePerformanceClick} />
+        <SOCRevenueChart data={yesterdayData} />
       </div>
       
       <BottomNavigation />
