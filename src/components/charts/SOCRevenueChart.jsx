@@ -1,13 +1,72 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts'
 import './Chart.css'
 
+// Custom bar shape that allows varying widths
+const CustomBar = (props) => {
+  const { x, y, width, height, payload } = props
+  
+  if (!payload || !payload.revenueBar || payload.revenueBar === 0) {
+    return null
+  }
+  
+  const barWidth = payload.barWidth || 6
+  
+  // Since revenueBar = 100 and domain is [0, 100], 
+  // y is the top position (value 100) and height is the full chart height (100 to 0)
+  return (
+    <rect
+      x={x - barWidth / 2}
+      y={y}
+      width={barWidth}
+      height={height}
+      fill="#b2ffbf"
+      opacity={0.7}
+    />
+  )
+}
+
 function SOCRevenueChart({ data }) {
-  // Transform data to include revenue periods as full-height bars
-  const chartData = data.map(item => ({
-    ...item,
-    revenueBar: item.revenue > 0 ? 100 : 0, // Full height bar when revenue exists
-  }))
+  // Transform data to include revenue periods with varying widths
+  const chartData = useMemo(() => {
+    // Create a seeded random function for consistent randomness per data point
+    const seededRandom = (seed) => {
+      const x = Math.sin(seed) * 10000
+      return x - Math.floor(x)
+    }
+    
+    return data.map((item, index) => {
+      if (item.revenue > 0) {
+        // Generate varied bar widths: 2px to 9px
+        // Use the time and index as seed for consistent randomness
+        const seed = parseInt(item.time) * 7 + index * 3
+        const randomValue = seededRandom(seed)
+        
+        // Create varied widths: 2, 3, 4, 5, 6, 7, 8, 9px
+        // Weight towards smaller widths (2-6px) more common, larger (7-9px) less common
+        let barWidth
+        if (randomValue < 0.3) {
+          barWidth = 2 + Math.floor(randomValue * 3) // 2-4px
+        } else if (randomValue < 0.7) {
+          barWidth = 4 + Math.floor((randomValue - 0.3) * 3) // 4-6px
+        } else {
+          barWidth = 6 + Math.floor((randomValue - 0.7) * 3) // 6-9px
+        }
+        
+        return {
+          ...item,
+          revenueBar: 100,
+          barWidth: barWidth,
+        }
+      }
+      
+      return {
+        ...item,
+        revenueBar: 0,
+        barWidth: 0,
+      }
+    })
+  }, [data])
 
   return (
     <div className="soc-revenue-chart-container">
@@ -63,19 +122,17 @@ function SOCRevenueChart({ data }) {
                 tickLine={false}
                 width={24}
               />
-            {/* Revenue bars - full height vertical bars (rendered first so line appears on top) */}
+            {/* Revenue bars - full height vertical bars with varying widths */}
             <Bar
               yAxisId="soc"
               dataKey="revenueBar"
-              fill="#b2ffbf"
+              shape={<CustomBar />}
               isAnimationActive={false}
-              barSize={6}
             >
               {chartData.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
-                  fill={entry.revenue > 0 ? '#b2ffbf' : 'transparent'} 
-                  opacity={entry.revenue > 0 ? 0.7 : 0}
+                  payload={{ ...entry, barWidth: entry.barWidth }}
                 />
               ))}
             </Bar>
