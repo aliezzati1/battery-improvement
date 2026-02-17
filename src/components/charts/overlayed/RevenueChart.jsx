@@ -2,13 +2,77 @@ import React, { useMemo } from 'react'
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine, Cell } from 'recharts'
 import '../Chart.css'
 
+// Custom bar shape that allows varying widths
+const CustomRevenueBar = (props) => {
+  const { x, y, width, height, payload } = props
+  
+  if (!payload || !payload.revenueBar || payload.revenueBar === 0) {
+    return null
+  }
+  
+  const barWidth = payload.barWidth || 6
+  
+  // Since revenueBar = 100 and domain is [0, 100], 
+  // y is the top position (value 100) and height is the full chart height (100 to 0)
+  return (
+    <rect
+      x={x - barWidth / 2}
+      y={y}
+      width={barWidth}
+      height={height}
+      fill="#b2ffbf"
+      opacity={0.7}
+    />
+  )
+}
+
 function RevenueChart({ data, cursorTime, onCursorUpdate }) {
+  // Transform data to include revenue periods with varying widths
+  const chartData = useMemo(() => {
+    // Create a seeded random function for consistent randomness per data point
+    const seededRandom = (seed) => {
+      const x = Math.sin(seed) * 10000
+      return x - Math.floor(x)
+    }
+    
+    return data.map((item, index) => {
+      if (item.revenue > 0) {
+        // Generate varied bar widths: 2px to 9px
+        // Use the time and index as seed for consistent randomness
+        const seed = parseInt(item.time) * 7 + index * 3
+        const randomValue = seededRandom(seed)
+        
+        // Create varied widths: 2, 3, 4, 5, 6, 7, 8, 9px
+        // Weight towards smaller widths (2-6px) more common, larger (7-9px) less common
+        let barWidth
+        if (randomValue < 0.3) {
+          barWidth = 2 + Math.floor(randomValue * 3) // 2-4px
+        } else if (randomValue < 0.7) {
+          barWidth = 4 + Math.floor((randomValue - 0.3) * 3) // 4-6px
+        } else {
+          barWidth = 6 + Math.floor((randomValue - 0.7) * 3) // 6-9px
+        }
+        
+        return {
+          ...item,
+          revenueBar: 100,
+          barWidth: barWidth,
+        }
+      }
+      
+      return {
+        ...item,
+        revenueBar: 0,
+        barWidth: 0,
+      }
+    })
+  }, [data])
 
   return (
     <div className="chart-container-overlayed">
       <ResponsiveContainer width="100%" height={300}>
         <ComposedChart
-          data={data}
+          data={chartData}
           margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
         >
           <CartesianGrid 
@@ -32,7 +96,7 @@ function RevenueChart({ data, cursorTime, onCursorUpdate }) {
           />
           <YAxis
             yAxisId="soc"
-            orientation="right"
+            orientation="left"
             domain={[0, 100]}
             tick={{ fill: '#353230', fontSize: 12, fontFamily: 'Inter', letterSpacing: '-0.06px' }}
             tickFormatter={(value) => {
@@ -44,8 +108,8 @@ function RevenueChart({ data, cursorTime, onCursorUpdate }) {
             width={26}
             label={{ 
               value: '%', 
-              angle: 90, 
-              position: 'insideRight', 
+              angle: -90, 
+              position: 'insideLeft', 
               offset: -5,
               style: { 
                 textAnchor: 'middle', 
@@ -56,6 +120,21 @@ function RevenueChart({ data, cursorTime, onCursorUpdate }) {
               } 
             }}
           />
+          {/* Revenue bars - full height vertical bars with varying widths */}
+          <Bar
+            yAxisId="soc"
+            dataKey="revenueBar"
+            shape={<CustomRevenueBar />}
+            isAnimationActive={false}
+          >
+            {chartData.map((entry, index) => (
+              <Cell 
+                key={`cell-${index}`} 
+                payload={{ ...entry, barWidth: entry.barWidth }}
+              />
+            ))}
+          </Bar>
+          {/* SOC line - rendered last so it appears on top */}
           <Line
             yAxisId="soc"
             type="stepAfter"
@@ -65,22 +144,6 @@ function RevenueChart({ data, cursorTime, onCursorUpdate }) {
             dot={false}
             isAnimationActive={false}
           />
-          <Bar
-            yAxisId="soc"
-            dataKey="revenue"
-            baseValue={0}
-            radius={[1, 1, 0, 0]}
-            isAnimationActive={false}
-            barSize={2}
-          >
-            {data.map((entry, index) => (
-              <Cell 
-                key={`cell-${index}`} 
-                fill={entry.revenue > 0 ? '#b2ffbf' : 'transparent'} 
-                opacity={entry.revenue > 0 ? 0.6 : 0}
-              />
-            ))}
-          </Bar>
           {cursorTime !== null && (
             <ReferenceLine
               x={String(cursorTime).padStart(2, '0')}
