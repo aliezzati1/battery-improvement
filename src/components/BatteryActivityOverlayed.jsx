@@ -174,7 +174,7 @@ function BatteryActivityOverlayed({ onBack }) {
               </div>
               <div className="metrics-row">
                 <div className="metric-small">
-                  <div className="metric-indicator earned"></div>
+                  <div className="metric-indicator soc-line"></div>
                   <div className="metric-content">
                     <span className="metric-value">
                       {currentData !== null 

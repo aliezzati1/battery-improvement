@@ -195,6 +195,14 @@
   background-color: #b2ffbf;
 }
 
+.metric-indicator.soc-line {
+  width: 20px;
+  height: 2px;
+  border-radius: 0;
+  background-color: #353230;
+  align-self: center;
+}
+
 .metric-content {
   display: flex;
   flex-direction: column;
