@@ -53,7 +53,7 @@ function PerformanceCard({ onClick }) {
         <ResponsiveContainer width="100%" height={280}>
           <ComposedChart
             data={data}
-            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
           >
             <defs>
               <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
