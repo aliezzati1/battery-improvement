@@ -29,6 +29,10 @@
   padding-left: 0;
 }
 
+.soc-revenue-chart-container .chart-legend {
+  margin-top: 8px;
+}
+
 .chart-legend-top {
   display: flex;
   gap: 24px;
