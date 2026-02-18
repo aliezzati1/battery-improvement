@@ -29,11 +29,23 @@ function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, o
           <span>Discharge</span>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={160}>
-        <ComposedChart
-          data={transformedData}
-          margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
-        >
+      <div className="chart-interactive-area">
+        <div
+          className="chart-overlay"
+          onMouseDown={onCursorStart}
+          onMouseMove={onCursorMove}
+          onMouseUp={onCursorEnd}
+          onMouseLeave={onCursorEnd}
+          onTouchStart={onCursorStart}
+          onTouchMove={onCursorMove}
+          onTouchEnd={onCursorEnd}
+          onTouchCancel={onCursorEnd}
+        />
+        <ResponsiveContainer width="100%" height={160}>
+          <ComposedChart
+            data={transformedData}
+            margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
+          >
           <CartesianGrid 
             strokeDasharray="0" 
             stroke="#f2efec" 
@@ -99,8 +111,9 @@ function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, o
               strokeDasharray="0"
             />
           )}
-        </ComposedChart>
-      </ResponsiveContainer>
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
       </div>
     </div>
   )

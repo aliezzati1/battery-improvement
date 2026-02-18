@@ -14,6 +14,7 @@ function BatterySOCChart({ data, cursorTime, onCursorStart, onCursorMove, onCurs
         onTouchStart={onCursorStart}
         onTouchMove={onCursorMove}
         onTouchEnd={onCursorEnd}
+        onTouchCancel={onCursorEnd}
       />
       <ResponsiveContainer width="100%" height={160}>
         <LineChart

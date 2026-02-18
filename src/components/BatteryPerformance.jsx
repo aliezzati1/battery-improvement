@@ -18,8 +18,8 @@ function BatteryPerformance({ onBack }) {
   ])
   const [draggedIndex, setDraggedIndex] = useState(null)
   const [cursorTime, setCursorTime] = useState(null) // Time in hours (0-23) for the vertical line
-  const [isDraggingCursor, setIsDraggingCursor] = useState(false)
   const chartsContainerRef = useRef(null)
+  const touchScrubbingRef = useRef(false)
 
   // Generate last 30 days
   const days = Array.from({ length: 30 }, (_, i) => {
@@ -73,10 +73,58 @@ function BatteryPerformance({ onBack }) {
     setDraggedIndex(null)
   }
 
-  // Cursor functionality temporarily disabled to fix blank screen issue
-  const handleCursorStart = () => {}
-  const handleCursorMove = () => {}
-  const handleCursorEnd = () => {}
+  const getClientX = (event) => {
+    if (event.touches && event.touches.length > 0) return event.touches[0].clientX
+    if (event.changedTouches && event.changedTouches.length > 0) return event.changedTouches[0].clientX
+    return event.clientX
+  }
+
+  const updateCursorPosition = useCallback((event) => {
+    const target = event.currentTarget
+    if (!target) return
+
+    const clientX = getClientX(event)
+    if (typeof clientX !== 'number') return
+
+    const rect = target.getBoundingClientRect()
+    if (!rect.width) return
+
+    const localX = Math.max(0, Math.min(clientX - rect.left, rect.width))
+    const ratio = localX / rect.width
+    const hour = Math.max(0, Math.min(23, Math.round(ratio * 23)))
+    setCursorTime(hour)
+  }, [])
+
+  const handleCursorStart = useCallback((event) => {
+    if (event.type === 'touchstart') {
+      touchScrubbingRef.current = true
+    }
+    updateCursorPosition(event)
+  }, [updateCursorPosition])
+
+  const handleCursorMove = useCallback((event) => {
+    if (event.type === 'mousemove') {
+      // Desktop hover support: show synced cursor line while pointer is over plot area.
+      updateCursorPosition(event)
+      return
+    }
+
+    if (event.type === 'touchmove' && touchScrubbingRef.current) {
+      updateCursorPosition(event)
+    }
+  }, [updateCursorPosition])
+
+  const handleCursorEnd = useCallback((event) => {
+    if (event.type === 'touchend' || event.type === 'touchcancel') {
+      touchScrubbingRef.current = false
+      setCursorTime(null)
+      return
+    }
+
+    if (event.type === 'mouseleave') {
+      setCursorTime(null)
+    }
+  }, [])
 
   return (
     <div className="battery-performance">
@@ -160,7 +208,7 @@ function BatteryPerformance({ onBack }) {
                 </div>
                 <ChartComponent 
                   data={dayData} 
-                  cursorTime={null}
+                  cursorTime={cursorTime}
                   onCursorStart={handleCursorStart}
                   onCursorMove={handleCursorMove}
                   onCursorEnd={handleCursorEnd}

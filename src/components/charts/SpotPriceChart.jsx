@@ -20,6 +20,17 @@ function SpotPriceChart({ data, cursorTime, onCursorStart, onCursorMove, onCurso
 
   return (
     <div className="chart-container">
+      <div
+        className="chart-overlay"
+        onMouseDown={onCursorStart}
+        onMouseMove={onCursorMove}
+        onMouseUp={onCursorEnd}
+        onMouseLeave={onCursorEnd}
+        onTouchStart={onCursorStart}
+        onTouchMove={onCursorMove}
+        onTouchEnd={onCursorEnd}
+        onTouchCancel={onCursorEnd}
+      />
       <ResponsiveContainer width="100%" height={160}>
         <ComposedChart
           data={data}
