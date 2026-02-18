@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import StatusBar from './StatusBar'
 import NavigationBar from './NavigationBar'
 import SpotPriceChart from './charts/SpotPriceChart'
@@ -20,6 +20,7 @@ function BatteryPerformance({ onBack }) {
   const [cursorTime, setCursorTime] = useState(null) // Time in hours (0-23) for the vertical line
   const chartsContainerRef = useRef(null)
   const touchScrubbingRef = useRef(false)
+  const rafRef = useRef(null)
 
   // Generate last 30 days
   const days = Array.from({ length: 30 }, (_, i) => {
@@ -74,55 +75,70 @@ function BatteryPerformance({ onBack }) {
   }
 
   const getClientX = (event) => {
+    if (typeof event.clientX === 'number') return event.clientX
     if (event.touches && event.touches.length > 0) return event.touches[0].clientX
     if (event.changedTouches && event.changedTouches.length > 0) return event.changedTouches[0].clientX
     return event.clientX
   }
 
   const updateCursorPosition = useCallback((event) => {
-    const target = event.currentTarget
-    if (!target) return
+    try {
+      const target = event.currentTarget
+      if (!target) return
 
-    const clientX = getClientX(event)
-    if (typeof clientX !== 'number') return
+      const clientX = getClientX(event)
+      if (typeof clientX !== 'number') return
 
-    const rect = target.getBoundingClientRect()
-    if (!rect.width) return
+      const rect = target.getBoundingClientRect()
+      if (!rect.width) return
 
-    const localX = Math.max(0, Math.min(clientX - rect.left, rect.width))
-    const ratio = localX / rect.width
-    const hour = Math.max(0, Math.min(23, Math.round(ratio * 23)))
-    setCursorTime(hour)
+      const localX = Math.max(0, Math.min(clientX - rect.left, rect.width))
+      const ratio = localX / rect.width
+      const hour = Math.max(0, Math.min(23, Math.round(ratio * 23)))
+
+      setCursorTime((prev) => (prev === hour ? prev : hour))
+    } catch (error) {
+      console.error('Cursor update failed:', error)
+    }
   }, [])
 
   const handleCursorStart = useCallback((event) => {
-    if (event.type === 'touchstart') {
+    if (event.pointerType === 'touch') {
       touchScrubbingRef.current = true
     }
     updateCursorPosition(event)
   }, [updateCursorPosition])
 
   const handleCursorMove = useCallback((event) => {
-    if (event.type === 'mousemove') {
-      // Desktop hover support: show synced cursor line while pointer is over plot area.
-      updateCursorPosition(event)
-      return
-    }
+    const isTouchPointer = event.pointerType === 'touch'
+    if (isTouchPointer && !touchScrubbingRef.current) return
 
-    if (event.type === 'touchmove' && touchScrubbingRef.current) {
-      updateCursorPosition(event)
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current)
     }
+    rafRef.current = requestAnimationFrame(() => {
+      updateCursorPosition(event)
+      rafRef.current = null
+    })
   }, [updateCursorPosition])
 
   const handleCursorEnd = useCallback((event) => {
-    if (event.type === 'touchend' || event.type === 'touchcancel') {
+    if (event.pointerType === 'touch' || event.type === 'pointercancel') {
       touchScrubbingRef.current = false
       setCursorTime(null)
       return
     }
 
-    if (event.type === 'mouseleave') {
+    if (event.type === 'pointerleave' || event.type === 'pointerup') {
       setCursorTime(null)
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+      }
     }
   }, [])
 
@@ -178,7 +194,7 @@ function BatteryPerformance({ onBack }) {
               <div
                 key={chart.id}
                 className={`chart-wrapper ${draggedIndex === index ? 'dragging' : ''}`}
-                draggable={typeof window !== 'undefined' && 'ontouchstart' in window ? false : true}
+                draggable={false}
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDragEnd={handleDragEnd}

@@ -7,14 +7,11 @@ function BatterySOCChart({ data, cursorTime, onCursorStart, onCursorMove, onCurs
     <div className="chart-container">
       <div
         className="chart-overlay"
-        onMouseDown={onCursorStart}
-        onMouseMove={onCursorMove}
-        onMouseUp={onCursorEnd}
-        onMouseLeave={onCursorEnd}
-        onTouchStart={onCursorStart}
-        onTouchMove={onCursorMove}
-        onTouchEnd={onCursorEnd}
-        onTouchCancel={onCursorEnd}
+        onPointerDown={onCursorStart}
+        onPointerMove={onCursorMove}
+        onPointerUp={onCursorEnd}
+        onPointerLeave={onCursorEnd}
+        onPointerCancel={onCursorEnd}
       />
       <ResponsiveContainer width="100%" height={160}>
         <LineChart
