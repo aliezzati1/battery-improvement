@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import StatusBar from './StatusBar'
 import { generateMockDataForDay } from '../utils/mockData'
 import ActivityChart from './charts/overlayed/ActivityChart'
@@ -21,8 +21,8 @@ function BatteryActivityOverlayed({ onBack }) {
     }
   })
 
-  // Get data for selected day
-  const dayData = generateMockDataForDay(selectedDay)
+  // Get data for selected day - memoized so it doesn't regenerate on hover
+  const dayData = useMemo(() => generateMockDataForDay(selectedDay), [selectedDay])
 
   // Calculate daily totals and averages
   const dailyMetrics = useMemo(() => {
@@ -87,9 +87,16 @@ function BatteryActivityOverlayed({ onBack }) {
     setCursorTime(null) // Reset cursor when changing day
   }
 
-  const handleCursorUpdate = (time) => {
-    setCursorTime(time)
-  }
+  // Scrubbing handlers
+  const handleChartMouseMove = useCallback((e) => {
+    if (e && e.activeLabel !== undefined && e.activeLabel !== null) {
+      setCursorTime(parseInt(e.activeLabel))
+    }
+  }, [])
+
+  const handleChartMouseLeave = useCallback(() => {
+    setCursorTime(null)
+  }, [])
 
   return (
     <div className="battery-activity-overlayed">
@@ -142,7 +149,7 @@ function BatteryActivityOverlayed({ onBack }) {
                   <span className="value">{spotPriceValue.toFixed(1).replace('.', ',')}</span>
                   <span className="unit"> öre/kWh</span>
                 </div>
-                <p className="metric-label">Avg. spot price</p>
+                <p className="metric-label">{cursorTime !== null ? formatTimeRange() : 'Avg. spot price'}</p>
               </div>
               <div className="metrics-row">
                 <div className="metric-small">
@@ -170,7 +177,7 @@ function BatteryActivityOverlayed({ onBack }) {
                   <span className="value">{spotPriceValue.toFixed(1).replace('.', ',')}</span>
                   <span className="unit"> öre/kWh</span>
                 </div>
-                <p className="metric-label">Avg. spot price</p>
+                <p className="metric-label">{cursorTime !== null ? formatTimeRange() : 'Avg. spot price'}</p>
               </div>
               <div className="metrics-row">
                 <div className="metric-small">
@@ -210,13 +217,15 @@ function BatteryActivityOverlayed({ onBack }) {
             <ActivityChart 
               data={dayData} 
               cursorTime={cursorTime}
-              onCursorUpdate={handleCursorUpdate}
+              onChartMouseMove={handleChartMouseMove}
+              onChartMouseLeave={handleChartMouseLeave}
             />
           ) : (
             <RevenueChart 
               data={dayData} 
               cursorTime={cursorTime}
-              onCursorUpdate={handleCursorUpdate}
+              onChartMouseMove={handleChartMouseMove}
+              onChartMouseLeave={handleChartMouseLeave}
             />
           )}
         </div>

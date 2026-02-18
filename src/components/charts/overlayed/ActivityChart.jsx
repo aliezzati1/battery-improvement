@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { ComposedChart, Line, Area, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine, Cell } from 'recharts'
 import '../Chart.css'
 
-function ActivityChart({ data, cursorTime, onCursorUpdate }) {
+function ActivityChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }) {
 
   // Calculate dynamic max values - center 0 in the middle
   // Spot prices are always positive (minimum 10), but axis is centered at 0
@@ -34,6 +34,8 @@ function ActivityChart({ data, cursorTime, onCursorUpdate }) {
         <ComposedChart
           data={data}
           margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+          onMouseMove={onChartMouseMove}
+          onMouseLeave={onChartMouseLeave}
         >
           <defs>
             <linearGradient id="activityPriceGradient" x1="0" y1="0" x2="0" y2="1">

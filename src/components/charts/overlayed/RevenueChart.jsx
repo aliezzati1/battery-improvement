@@ -26,7 +26,7 @@ const CustomRevenueBar = (props) => {
   )
 }
 
-function RevenueChart({ data, cursorTime, onCursorUpdate }) {
+function RevenueChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }) {
   // Transform data to include revenue periods with varying widths
   const chartData = useMemo(() => {
     // Create a seeded random function for consistent randomness per data point
@@ -74,6 +74,8 @@ function RevenueChart({ data, cursorTime, onCursorUpdate }) {
         <ComposedChart
           data={chartData}
           margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+          onMouseMove={onChartMouseMove}
+          onMouseLeave={onChartMouseLeave}
         >
           <CartesianGrid 
             strokeDasharray="0" 
