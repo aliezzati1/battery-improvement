@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react'
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import StatusBar from './StatusBar'
 import NavigationBar from './NavigationBar'
 import SpotPriceChart from './charts/SpotPriceChart'
@@ -31,8 +31,8 @@ function BatteryPerformance({ onBack }) {
     }
   })
 
-  // Get data for selected day
-  const dayData = generateMockDataForDay(selectedDay)
+  // Get data for selected day - memoized so it only changes when the day changes
+  const dayData = useMemo(() => generateMockDataForDay(selectedDay), [selectedDay])
 
   const handleDaySelect = (index) => {
     setSelectedDay(index)
