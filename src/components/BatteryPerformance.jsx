@@ -21,6 +21,7 @@ function BatteryPerformance({ onBack }) {
   const chartsContainerRef = useRef(null)
   const touchScrubbingRef = useRef(false)
   const rafRef = useRef(null)
+  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
 
   // Generate last 30 days
   const days = Array.from({ length: 30 }, (_, i) => {
@@ -53,14 +54,16 @@ function BatteryPerformance({ onBack }) {
 
   const handleDragOver = (e, index) => {
     try {
+      if (draggedIndex === null || draggedIndex === index) return
+
       e.preventDefault()
       if (e.dataTransfer) {
         e.dataTransfer.dropEffect = 'move'
       }
-      if (draggedIndex === null || draggedIndex === index) return
 
       const newOrder = [...chartOrder]
       const draggedItem = newOrder[draggedIndex]
+      if (!draggedItem) return
       newOrder.splice(draggedIndex, 1)
       newOrder.splice(index, 0, draggedItem)
       setChartOrder(newOrder)
@@ -74,19 +77,9 @@ function BatteryPerformance({ onBack }) {
     setDraggedIndex(null)
   }
 
-  const getClientX = (event) => {
-    if (typeof event.clientX === 'number') return event.clientX
-    if (event.touches && event.touches.length > 0) return event.touches[0].clientX
-    if (event.changedTouches && event.changedTouches.length > 0) return event.changedTouches[0].clientX
-    return event.clientX
-  }
-
-  const updateCursorPosition = useCallback((event) => {
+  const updateCursorPosition = useCallback((target, clientX) => {
     try {
-      const target = event.currentTarget
       if (!target) return
-
-      const clientX = getClientX(event)
       if (typeof clientX !== 'number') return
 
       const rect = target.getBoundingClientRect()
@@ -103,26 +96,36 @@ function BatteryPerformance({ onBack }) {
   }, [])
 
   const handleCursorStart = useCallback((event) => {
+    event.stopPropagation()
+
     if (event.pointerType === 'touch') {
       touchScrubbingRef.current = true
     }
-    updateCursorPosition(event)
+
+    updateCursorPosition(event.currentTarget, event.clientX)
   }, [updateCursorPosition])
 
   const handleCursorMove = useCallback((event) => {
+    event.stopPropagation()
+
     const isTouchPointer = event.pointerType === 'touch'
     if (isTouchPointer && !touchScrubbingRef.current) return
+
+    const target = event.currentTarget
+    const clientX = event.clientX
 
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current)
     }
     rafRef.current = requestAnimationFrame(() => {
-      updateCursorPosition(event)
+      updateCursorPosition(target, clientX)
       rafRef.current = null
     })
   }, [updateCursorPosition])
 
   const handleCursorEnd = useCallback((event) => {
+    event.stopPropagation()
+
     if (event.pointerType === 'touch' || event.type === 'pointercancel') {
       touchScrubbingRef.current = false
       setCursorTime(null)
@@ -195,9 +198,8 @@ function BatteryPerformance({ onBack }) {
                 key={chart.id}
                 className={`chart-wrapper ${draggedIndex === index ? 'dragging' : ''}`}
                 draggable={false}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragOver={(e) => handleDragOver(e, index)}
-                onDragEnd={handleDragEnd}
+                onDragOver={isTouchDevice ? undefined : (e) => handleDragOver(e, index)}
+                onDrop={isTouchDevice ? undefined : handleDragEnd}
               >
                 <div className="chart-header">
                   <div className="chart-title-section">
@@ -206,11 +208,13 @@ function BatteryPerformance({ onBack }) {
                   </div>
                   <div 
                     className="drag-handle" 
-                    draggable
+                    draggable={!isTouchDevice}
                     onDragStart={(e) => {
+                      if (isTouchDevice) return
                       e.stopPropagation()
                       handleDragStart(e, index)
                     }}
+                    onDragEnd={isTouchDevice ? undefined : handleDragEnd}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path d="M9 5H11V7H9V5Z" fill="black"/>

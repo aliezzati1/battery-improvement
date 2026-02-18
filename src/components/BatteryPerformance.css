@@ -127,10 +127,9 @@
   background-color: white;
   border-radius: 4px;
   padding: 12px;
-  cursor: move;
   transition: opacity 0.2s;
   position: relative;
-  cursor: crosshair;
+  cursor: default;
 }
 
 .chart-wrapper.dragging {
