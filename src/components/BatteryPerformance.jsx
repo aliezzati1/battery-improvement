@@ -18,6 +18,7 @@ function BatteryPerformance({ onBack }) {
   ])
   const [draggedIndex, setDraggedIndex] = useState(null)
   const [cursorTime, setCursorTime] = useState(null) // Time string e.g. "14" for the vertical line
+  const [cursorX, setCursorX] = useState(null) // Pixel x-position for the single continuous line
   const chartsContainerRef = useRef(null)
 
   // Generate last 30 days
@@ -77,10 +78,15 @@ function BatteryPerformance({ onBack }) {
     if (e && e.activeLabel !== undefined && e.activeLabel !== null) {
       setCursorTime(e.activeLabel)
     }
+    if (e && e.activeCoordinate) {
+      // 12px is the chart-wrapper padding-left
+      setCursorX(12 + e.activeCoordinate.x)
+    }
   }, [])
 
   const handleChartMouseLeave = useCallback(() => {
     setCursorTime(null)
+    setCursorX(null)
   }, [])
 
   // Touch scrubbing support for mobile
@@ -130,11 +136,17 @@ function BatteryPerformance({ onBack }) {
         e.preventDefault()
         const time = getTimeFromX(touch.clientX)
         if (time !== null) setCursorTime(time)
+        // Calculate cursorX relative to the charts container
+        const containerRect = el.getBoundingClientRect()
+        setCursorX(touch.clientX - containerRect.left)
       }
     }
 
     const onTouchEnd = () => {
-      if (scrubbing) setCursorTime(null)
+      if (scrubbing) {
+        setCursorTime(null)
+        setCursorX(null)
+      }
       scrubbing = false
       decided = false
       startPos = null
@@ -198,6 +210,21 @@ function BatteryPerformance({ onBack }) {
           ref={chartsContainerRef}
           onMouseLeave={handleChartMouseLeave}
         >
+          {cursorX !== null && (
+            <div
+              className="scrub-line"
+              style={{
+                position: 'absolute',
+                left: cursorX,
+                top: 0,
+                bottom: 0,
+                width: '1.5px',
+                backgroundColor: '#000000',
+                pointerEvents: 'none',
+                zIndex: 10,
+              }}
+            />
+          )}
           {chartOrder.map((chart, index) => {
             const ChartComponent = chart.component
             return (
@@ -234,7 +261,6 @@ function BatteryPerformance({ onBack }) {
                 </div>
                 <ChartComponent 
                   data={dayData} 
-                  cursorTime={cursorTime}
                   onChartMouseMove={handleChartMouseMove}
                   onChartMouseLeave={handleChartMouseLeave}
                 />

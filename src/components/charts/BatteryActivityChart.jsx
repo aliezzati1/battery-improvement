@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
 import './Chart.css'
 
-function BatteryActivityChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }) {
+function BatteryActivityChart({ data, onChartMouseMove, onChartMouseLeave }) {
   // Calculate dynamic domain based on data
   const maxAbs = useMemo(() => {
     const max = Math.max(...data.map(d => Math.abs(d.batteryActivity)))
@@ -92,15 +92,6 @@ function BatteryActivityChart({ data, cursorTime, onChartMouseMove, onChartMouse
               )
             })}
           </Bar>
-          {cursorTime !== null && (
-            <ReferenceLine
-              yAxisId="activity"
-              x={cursorTime}
-              stroke="#000000"
-              strokeWidth={1.5}
-              isFront={true}
-            />
-          )}
         </ComposedChart>
       </ResponsiveContainer>
       </div>

@@ -1,8 +1,8 @@
 import React from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 import './Chart.css'
 
-function BatterySOCChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }) {
+function BatterySOCChart({ data, onChartMouseMove, onChartMouseLeave }) {
   return (
     <div className="chart-container">
       <ResponsiveContainer width="100%" height={160}>
@@ -53,15 +53,6 @@ function BatterySOCChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave
             dot={false}
             isAnimationActive={false}
           />
-          {cursorTime !== null && (
-            <ReferenceLine
-              yAxisId="soc"
-              x={cursorTime}
-              stroke="#000000"
-              strokeWidth={1.5}
-              isFront={true}
-            />
-          )}
         </LineChart>
       </ResponsiveContainer>
     </div>

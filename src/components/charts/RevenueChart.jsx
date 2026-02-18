@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts'
 import './Chart.css'
 
-function RevenueChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }) {
+function RevenueChart({ data, onChartMouseMove, onChartMouseLeave }) {
   // Calculate dynamic max value from data
   const maxRevenue = useMemo(() => {
     const max = Math.max(...data.map(d => d.revenue))
@@ -80,15 +80,6 @@ function RevenueChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave })
               <Cell key={`cell-${index}`} fill={entry.revenue > 0 ? '#009a33' : 'transparent'} />
             ))}
           </Bar>
-          {cursorTime !== null && (
-            <ReferenceLine
-              yAxisId="revenue"
-              x={cursorTime}
-              stroke="#000000"
-              strokeWidth={1.5}
-              isFront={true}
-            />
-          )}
         </BarChart>
       </ResponsiveContainer>
     </div>
