@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import StatusBar from './StatusBar'
 import { generateMockDataForDay } from '../utils/mockData'
 import ActivityChart from './charts/overlayed/ActivityChart'
@@ -9,6 +9,7 @@ function BatteryActivityOverlayed({ onBack }) {
   const [selectedDay, setSelectedDay] = useState(0)
   const [activeTab, setActiveTab] = useState('activity') // 'activity' or 'revenue'
   const [cursorTime, setCursorTime] = useState(null)
+  const chartAreaRef = useRef(null)
 
   // Generate last 30 days
   const days = Array.from({ length: 30 }, (_, i) => {
@@ -96,6 +97,75 @@ function BatteryActivityOverlayed({ onBack }) {
 
   const handleChartMouseLeave = useCallback(() => {
     setCursorTime(null)
+  }, [])
+
+  // Touch scrubbing support for mobile
+  useEffect(() => {
+    const el = chartAreaRef.current
+    if (!el) return
+
+    let startPos = null
+    let decided = false
+    let scrubbing = false
+
+    const getTimeFromX = (clientX) => {
+      const wrapper = el.querySelector('.recharts-wrapper')
+      if (!wrapper) return null
+      const rect = wrapper.getBoundingClientRect()
+      // Overlayed charts have margin: { left: 20, right: 30 }
+      const plotLeft = rect.left + 20
+      const plotRight = rect.right - 30
+      const plotWidth = plotRight - plotLeft
+      const relX = clientX - plotLeft
+      const fraction = Math.max(0, Math.min(1, relX / plotWidth))
+      const hour = Math.round(fraction * 23)
+      return hour
+    }
+
+    const onTouchStart = (e) => {
+      if (e.touches.length !== 1) return
+      startPos = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      decided = false
+      scrubbing = false
+    }
+
+    const onTouchMove = (e) => {
+      const touch = e.touches[0]
+      if (!touch || !startPos) return
+
+      if (!decided) {
+        const dx = Math.abs(touch.clientX - startPos.x)
+        const dy = Math.abs(touch.clientY - startPos.y)
+        if (dx + dy > 10) {
+          decided = true
+          scrubbing = dx > dy // horizontal = scrub, vertical = scroll
+        }
+        if (!decided) return
+      }
+
+      if (scrubbing) {
+        e.preventDefault()
+        const time = getTimeFromX(touch.clientX)
+        if (time !== null) setCursorTime(time)
+      }
+    }
+
+    const onTouchEnd = () => {
+      if (scrubbing) setCursorTime(null)
+      scrubbing = false
+      decided = false
+      startPos = null
+    }
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    el.addEventListener('touchend', onTouchEnd, { passive: true })
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove', onTouchMove)
+      el.removeEventListener('touchend', onTouchEnd)
+    }
   }, [])
 
   return (
@@ -212,7 +282,7 @@ function BatteryActivityOverlayed({ onBack }) {
         </div>
 
         {/* Chart Area */}
-        <div className="chart-area">
+        <div className="chart-area" ref={chartAreaRef}>
           {activeTab === 'activity' ? (
             <ActivityChart 
               data={dayData} 
