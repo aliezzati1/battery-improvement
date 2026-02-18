@@ -164,11 +164,11 @@ function ActivityChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }
           </Bar>
           {cursorTime !== null && (
             <ReferenceLine
+              yAxisId="price"
               x={String(cursorTime).padStart(2, '0')}
               stroke="#000000"
-              strokeWidth={2}
+              strokeWidth={1.5}
               isFront={true}
-              strokeDasharray="0"
             />
           )}
         </ComposedChart>

@@ -148,11 +148,11 @@ function RevenueChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave })
           />
           {cursorTime !== null && (
             <ReferenceLine
+              yAxisId="soc"
               x={String(cursorTime).padStart(2, '0')}
               stroke="#000000"
-              strokeWidth={2}
+              strokeWidth={1.5}
               isFront={true}
-              strokeDasharray="0"
             />
           )}
         </ComposedChart>
