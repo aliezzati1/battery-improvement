@@ -17,11 +17,8 @@ function BatteryPerformance({ onBack }) {
     { id: 'battery-activity', component: BatteryActivityChart, title: 'Battery activity', subtitle: '(kWh)' },
   ])
   const [draggedIndex, setDraggedIndex] = useState(null)
-  const [cursorTime, setCursorTime] = useState(null) // Time in hours (0-23) for the vertical line
+  const [cursorTime, setCursorTime] = useState(null) // Time string e.g. "14" for the vertical line
   const chartsContainerRef = useRef(null)
-  const touchScrubbingRef = useRef(false)
-  const rafRef = useRef(null)
-  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
 
   // Generate last 30 days
   const days = Array.from({ length: 30 }, (_, i) => {
@@ -54,16 +51,14 @@ function BatteryPerformance({ onBack }) {
 
   const handleDragOver = (e, index) => {
     try {
-      if (draggedIndex === null || draggedIndex === index) return
-
       e.preventDefault()
       if (e.dataTransfer) {
         e.dataTransfer.dropEffect = 'move'
       }
+      if (draggedIndex === null || draggedIndex === index) return
 
       const newOrder = [...chartOrder]
       const draggedItem = newOrder[draggedIndex]
-      if (!draggedItem) return
       newOrder.splice(draggedIndex, 1)
       newOrder.splice(index, 0, draggedItem)
       setChartOrder(newOrder)
@@ -77,71 +72,82 @@ function BatteryPerformance({ onBack }) {
     setDraggedIndex(null)
   }
 
-  const updateCursorPosition = useCallback((target, clientX) => {
-    try {
-      if (!target) return
-      if (typeof clientX !== 'number') return
-
-      const rect = target.getBoundingClientRect()
-      if (!rect.width) return
-
-      const localX = Math.max(0, Math.min(clientX - rect.left, rect.width))
-      const ratio = localX / rect.width
-      const hour = Math.max(0, Math.min(23, Math.round(ratio * 23)))
-
-      setCursorTime((prev) => (prev === hour ? prev : hour))
-    } catch (error) {
-      console.error('Cursor update failed:', error)
+  // Synchronized cursor/scrubbing across all charts
+  const handleChartMouseMove = useCallback((e) => {
+    if (e && e.activeLabel !== undefined && e.activeLabel !== null) {
+      setCursorTime(e.activeLabel)
     }
   }, [])
 
-  const handleCursorStart = useCallback((event) => {
-    event.stopPropagation()
-
-    if (event.pointerType === 'touch') {
-      touchScrubbingRef.current = true
-    }
-
-    updateCursorPosition(event.currentTarget, event.clientX)
-  }, [updateCursorPosition])
-
-  const handleCursorMove = useCallback((event) => {
-    event.stopPropagation()
-
-    const isTouchPointer = event.pointerType === 'touch'
-    if (isTouchPointer && !touchScrubbingRef.current) return
-
-    const target = event.currentTarget
-    const clientX = event.clientX
-
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current)
-    }
-    rafRef.current = requestAnimationFrame(() => {
-      updateCursorPosition(target, clientX)
-      rafRef.current = null
-    })
-  }, [updateCursorPosition])
-
-  const handleCursorEnd = useCallback((event) => {
-    event.stopPropagation()
-
-    if (event.pointerType === 'touch' || event.type === 'pointercancel') {
-      touchScrubbingRef.current = false
-      setCursorTime(null)
-      return
-    }
-
-    if (event.type === 'pointerleave' || event.type === 'pointerup') {
-      setCursorTime(null)
-    }
+  const handleChartMouseLeave = useCallback(() => {
+    setCursorTime(null)
   }, [])
 
+  // Touch scrubbing support for mobile
   useEffect(() => {
-    return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current)
+    const el = chartsContainerRef.current
+    if (!el) return
+
+    let startPos = null
+    let decided = false
+    let scrubbing = false
+
+    const getTimeFromX = (clientX) => {
+      const wrapper = el.querySelector('.recharts-wrapper')
+      if (!wrapper) return null
+      const rect = wrapper.getBoundingClientRect()
+      const plotLeft = rect.left
+      const plotRight = rect.right - 30 // right margin
+      const plotWidth = plotRight - plotLeft
+      const relX = clientX - plotLeft
+      const fraction = Math.max(0, Math.min(1, relX / plotWidth))
+      const hour = Math.round(fraction * 23)
+      return String(hour).padStart(2, '0')
+    }
+
+    const onTouchStart = (e) => {
+      if (e.touches.length !== 1) return
+      startPos = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      decided = false
+      scrubbing = false
+    }
+
+    const onTouchMove = (e) => {
+      const touch = e.touches[0]
+      if (!touch || !startPos) return
+
+      if (!decided) {
+        const dx = Math.abs(touch.clientX - startPos.x)
+        const dy = Math.abs(touch.clientY - startPos.y)
+        if (dx + dy > 10) {
+          decided = true
+          scrubbing = dx > dy // horizontal = scrub, vertical = scroll
+        }
+        if (!decided) return
       }
+
+      if (scrubbing) {
+        e.preventDefault()
+        const time = getTimeFromX(touch.clientX)
+        if (time !== null) setCursorTime(time)
+      }
+    }
+
+    const onTouchEnd = () => {
+      if (scrubbing) setCursorTime(null)
+      scrubbing = false
+      decided = false
+      startPos = null
+    }
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    el.addEventListener('touchend', onTouchEnd, { passive: true })
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove', onTouchMove)
+      el.removeEventListener('touchend', onTouchEnd)
     }
   }, [])
 
@@ -190,6 +196,7 @@ function BatteryPerformance({ onBack }) {
         <div 
           className="charts-container"
           ref={chartsContainerRef}
+          onMouseLeave={handleChartMouseLeave}
         >
           {chartOrder.map((chart, index) => {
             const ChartComponent = chart.component
@@ -197,9 +204,10 @@ function BatteryPerformance({ onBack }) {
               <div
                 key={chart.id}
                 className={`chart-wrapper ${draggedIndex === index ? 'dragging' : ''}`}
-                draggable={false}
-                onDragOver={isTouchDevice ? undefined : (e) => handleDragOver(e, index)}
-                onDrop={isTouchDevice ? undefined : handleDragEnd}
+                draggable={typeof window !== 'undefined' && 'ontouchstart' in window ? false : true}
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragEnd={handleDragEnd}
               >
                 <div className="chart-header">
                   <div className="chart-title-section">
@@ -208,13 +216,11 @@ function BatteryPerformance({ onBack }) {
                   </div>
                   <div 
                     className="drag-handle" 
-                    draggable={!isTouchDevice}
+                    draggable
                     onDragStart={(e) => {
-                      if (isTouchDevice) return
                       e.stopPropagation()
                       handleDragStart(e, index)
                     }}
-                    onDragEnd={isTouchDevice ? undefined : handleDragEnd}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path d="M9 5H11V7H9V5Z" fill="black"/>
@@ -229,9 +235,8 @@ function BatteryPerformance({ onBack }) {
                 <ChartComponent 
                   data={dayData} 
                   cursorTime={cursorTime}
-                  onCursorStart={handleCursorStart}
-                  onCursorMove={handleCursorMove}
-                  onCursorEnd={handleCursorEnd}
+                  onChartMouseMove={handleChartMouseMove}
+                  onChartMouseLeave={handleChartMouseLeave}
                 />
               </div>
             )

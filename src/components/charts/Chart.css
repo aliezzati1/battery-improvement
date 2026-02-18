@@ -16,20 +16,7 @@
   position: relative;
 }
 
-.chart-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  background: transparent;
-  display: block;
-  touch-action: none;
-}
-
-.chart-interactive-area {
-  position: relative;
-  width: 100%;
-  height: 160px;
-}
+/* chart-overlay removed - scrubbing handled via Recharts mouse events and container touch events */
 
 .chart-legend {
   display: flex;

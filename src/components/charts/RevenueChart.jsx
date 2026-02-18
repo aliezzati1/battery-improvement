@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
 import './Chart.css'
 
-function RevenueChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorEnd }) {
+function RevenueChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }) {
   // Calculate dynamic max value from data
   const maxRevenue = useMemo(() => {
     const max = Math.max(...data.map(d => d.revenue))
@@ -30,18 +30,12 @@ function RevenueChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorE
 
   return (
     <div className="chart-container">
-      <div
-        className="chart-overlay"
-        onPointerDown={onCursorStart}
-        onPointerMove={onCursorMove}
-        onPointerUp={onCursorEnd}
-        onPointerLeave={onCursorEnd}
-        onPointerCancel={onCursorEnd}
-      />
       <ResponsiveContainer width="100%" height={160}>
         <BarChart
           data={data}
           margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
+          onMouseMove={onChartMouseMove}
+          onMouseLeave={onChartMouseLeave}
         >
           <CartesianGrid 
             strokeDasharray="0" 
@@ -88,11 +82,11 @@ function RevenueChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorE
           </Bar>
           {cursorTime !== null && (
             <ReferenceLine
-              x={String(cursorTime).padStart(2, '0')}
+              yAxisId="revenue"
+              x={cursorTime}
               stroke="#000000"
-              strokeWidth={2}
+              strokeWidth={1.5}
               isFront={true}
-              strokeDasharray="0"
             />
           )}
         </BarChart>

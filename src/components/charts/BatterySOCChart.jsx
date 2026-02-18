@@ -2,21 +2,15 @@ import React from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts'
 import './Chart.css'
 
-function BatterySOCChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorEnd }) {
+function BatterySOCChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }) {
   return (
     <div className="chart-container">
-      <div
-        className="chart-overlay"
-        onPointerDown={onCursorStart}
-        onPointerMove={onCursorMove}
-        onPointerUp={onCursorEnd}
-        onPointerLeave={onCursorEnd}
-        onPointerCancel={onCursorEnd}
-      />
       <ResponsiveContainer width="100%" height={160}>
         <LineChart
           data={data}
           margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
+          onMouseMove={onChartMouseMove}
+          onMouseLeave={onChartMouseLeave}
         >
           <CartesianGrid 
             strokeDasharray="0" 
@@ -61,11 +55,11 @@ function BatterySOCChart({ data, cursorTime, onCursorStart, onCursorMove, onCurs
           />
           {cursorTime !== null && (
             <ReferenceLine
-              x={String(cursorTime).padStart(2, '0')}
+              yAxisId="soc"
+              x={cursorTime}
               stroke="#000000"
-              strokeWidth={2}
+              strokeWidth={1.5}
               isFront={true}
-              strokeDasharray="0"
             />
           )}
         </LineChart>

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
 import './Chart.css'
 
-function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorEnd }) {
+function BatteryActivityChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }) {
   // Calculate dynamic domain based on data
   const maxAbs = useMemo(() => {
     const max = Math.max(...data.map(d => Math.abs(d.batteryActivity)))
@@ -29,20 +29,13 @@ function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, o
           <span>Discharge</span>
         </div>
       </div>
-      <div className="chart-interactive-area">
-        <div
-          className="chart-overlay"
-          onPointerDown={onCursorStart}
-          onPointerMove={onCursorMove}
-          onPointerUp={onCursorEnd}
-          onPointerLeave={onCursorEnd}
-          onPointerCancel={onCursorEnd}
-        />
-        <ResponsiveContainer width="100%" height={160}>
-          <ComposedChart
-            data={transformedData}
-            margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
-          >
+      <ResponsiveContainer width="100%" height={160}>
+        <ComposedChart
+          data={transformedData}
+          margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
+          onMouseMove={onChartMouseMove}
+          onMouseLeave={onChartMouseLeave}
+        >
           <CartesianGrid 
             strokeDasharray="0" 
             stroke="#f2efec" 
@@ -101,16 +94,15 @@ function BatteryActivityChart({ data, cursorTime, onCursorStart, onCursorMove, o
           </Bar>
           {cursorTime !== null && (
             <ReferenceLine
-              x={String(cursorTime).padStart(2, '0')}
+              yAxisId="activity"
+              x={cursorTime}
               stroke="#000000"
-              strokeWidth={2}
+              strokeWidth={1.5}
               isFront={true}
-              strokeDasharray="0"
             />
           )}
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
+        </ComposedChart>
+      </ResponsiveContainer>
       </div>
     </div>
   )

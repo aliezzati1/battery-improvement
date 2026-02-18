@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts'
 import './Chart.css'
 
-function SpotPriceChart({ data, cursorTime, onCursorStart, onCursorMove, onCursorEnd }) {
+function SpotPriceChart({ data, cursorTime, onChartMouseMove, onChartMouseLeave }) {
   // Calculate dynamic max value from data
   const maxPrice = useMemo(() => {
     const max = Math.max(...data.map(d => d.spotPrice))
@@ -20,18 +20,12 @@ function SpotPriceChart({ data, cursorTime, onCursorStart, onCursorMove, onCurso
 
   return (
     <div className="chart-container">
-      <div
-        className="chart-overlay"
-        onPointerDown={onCursorStart}
-        onPointerMove={onCursorMove}
-        onPointerUp={onCursorEnd}
-        onPointerLeave={onCursorEnd}
-        onPointerCancel={onCursorEnd}
-      />
       <ResponsiveContainer width="100%" height={160}>
         <ComposedChart
           data={data}
           margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
+          onMouseMove={onChartMouseMove}
+          onMouseLeave={onChartMouseLeave}
         >
           <defs>
             <linearGradient id="spotPriceGradient" x1="0" y1="0" x2="0" y2="1">
@@ -93,11 +87,11 @@ function SpotPriceChart({ data, cursorTime, onCursorStart, onCursorMove, onCurso
           />
           {cursorTime !== null && (
             <ReferenceLine
-              x={String(cursorTime).padStart(2, '0')}
+              yAxisId="price"
+              x={cursorTime}
               stroke="#000000"
-              strokeWidth={2}
+              strokeWidth={1.5}
               isFront={true}
-              strokeDasharray="0"
             />
           )}
         </ComposedChart>
